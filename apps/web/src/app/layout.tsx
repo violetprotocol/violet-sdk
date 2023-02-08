@@ -1,9 +1,14 @@
+import { ReactNode } from "react";
+import Providers from "./providers";
+
 import "../styles/globals.css";
 
-const RootLayout = ({ children }: { children: React.ReactNode }) => {
+const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 };
