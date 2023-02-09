@@ -1,15 +1,14 @@
-"use client";
-
 import { useNetwork, useAccount } from "wagmi";
-
-const BASE_API_URL = "http://localhost:8080";
+import { API_URL } from "./constants";
 
 const useViolet = ({
   clientId,
   redirectUrl,
+  apiUrl = API_URL,
 }: {
   clientId: string;
   redirectUrl: string;
+  apiUrl?: string;
 }) => {
   const { address } = useAccount();
   const { chain } = useNetwork();
@@ -29,7 +28,11 @@ const useViolet = ({
       throw new Error("NO_CHAIN_SELECTED");
     }
 
-    const url = new URL(`${BASE_API_URL}/api/authz/authorize`);
+    if (typeof window === "undefined") {
+      throw new Error("WINDOW_NOT_AVAILABLE");
+    }
+
+    const url = new URL(`${apiUrl}/api/authz/authorize`);
 
     url.searchParams.append("account_id", `eip155:${chain.id}:${address}`);
 
