@@ -1,10 +1,13 @@
 {
   "name": "@violetprotocol/sdk",
   "version": "0.0.1",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": "./dist"
-  },
+  "sideEffects": false,
+  "files": [
+    "dist/**"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "tsup",
