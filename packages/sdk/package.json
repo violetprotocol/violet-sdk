@@ -1,5 +1,5 @@
 {
-  "name": "sdk",
+  "name": "@violetprotocol/sdk",
   "version": "0.0.0",
   "types": "./dist/index.d.ts",
   "exports": {

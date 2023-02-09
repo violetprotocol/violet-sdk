@@ -4,6 +4,7 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
+  transpilePackages: ["@violetprotocol/sdk"],
 };
 
 module.exports = nextConfig;

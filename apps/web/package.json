@@ -20,7 +20,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.1",
-    "sdk": "workspace:*",
+    "@violetprotocol/sdk": "workspace:*",
     "tailwind-merge": "^1.9.1",
     "wagmi": "^0.11.5"
   },

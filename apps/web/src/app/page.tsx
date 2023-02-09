@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useAccount, useConnect, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useConnect, useNetwork } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
-import { useViolet } from "sdk";
+import { useViolet } from "@violetprotocol/sdk";
 import {
   mainnet,
   arbitrumGoerli,
@@ -77,7 +77,6 @@ const LOCAL_API_URL = "http://localhost:8080";
 
 const Page = () => {
   const { isConnected } = useAccount();
-  const { switchNetwork } = useSwitchNetwork();
   const { chain } = useNetwork();
   const { connect } = useConnect({
     connector: new InjectedConnector(),
@@ -158,13 +157,12 @@ const Page = () => {
   }, [searchParams, router]);
 
   useEffect(() => {
-    // sync network
+    if (!chain) return;
+
     if (chain.id === network) return;
 
-    if (!switchNetwork) return;
-
-    switchNetwork(network);
-  }, [network, chain, switchNetwork]);
+    setNetwork(chain.id);
+  }, [network, chain]);
 
   if (!hasMounted) return null;
 

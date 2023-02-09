@@ -32,7 +32,9 @@ const useViolet = ({
       throw new Error("WINDOW_NOT_AVAILABLE");
     }
 
-    const url = new URL(`${apiUrl}/api/authz/authorize`);
+    const parsedApiUrl = new URL(apiUrl);
+
+    const url = new URL(`${parsedApiUrl.toString()}api/authz/authorize`);
 
     url.searchParams.append("account_id", `eip155:${chain.id}:${address}`);
 
