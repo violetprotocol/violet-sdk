@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useAccount, useConnect, useNetwork } from "wagmi";
+import { useAccount, useConnect, useNetwork, useSwitchNetwork } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { useViolet } from "sdk";
 import {
@@ -77,6 +77,7 @@ const LOCAL_API_URL = "http://localhost:8080";
 
 const Page = () => {
   const { isConnected } = useAccount();
+  const { switchNetwork } = useSwitchNetwork();
   const { chain } = useNetwork();
   const { connect } = useConnect({
     connector: new InjectedConnector(),
@@ -93,9 +94,12 @@ const Page = () => {
   const [transactionFunctionSignature, setTransactionFunctionSignature] =
     useState<string>(TX_FUNCTION_SIGNATURE);
   const [transactionTargetContract, setTransactionTargetContract] =
-    useState<string>(getHumanBoundContractAddressByNetworkId(chain.id));
+    useState<string>(
+      getHumanBoundContractAddressByNetworkId(chainIds.arbitrum_goerli)
+    );
   const [redirectUrl, setRedirectUrl] = useState<string>(REDIRECT_URL);
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
+  const [network, setNetwork] = useState<number>(chainIds.arbitrum_goerli);
 
   const { register, handleSubmit } = useForm<{
     apiUrl: string;
@@ -153,6 +157,15 @@ const Page = () => {
     router.replace("/");
   }, [searchParams, router]);
 
+  useEffect(() => {
+    // sync network
+    if (chain.id === network) return;
+
+    if (!switchNetwork) return;
+
+    switchNetwork(network);
+  }, [network, chain, switchNetwork]);
+
   if (!hasMounted) return null;
 
   const handleAuthorize = async () => {
@@ -188,7 +201,11 @@ const Page = () => {
   return (
     <main className="flex h-screen justify-center items-center">
       {!isConnected ? (
-        <div className="h-36 w-36 cursor-pointer" onClick={handleConnect}>
+        <div
+          id="NOT_CONNECTED"
+          className="h-36 w-36 cursor-pointer"
+          onClick={handleConnect}
+        >
           <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle
               cx="44"
@@ -203,7 +220,7 @@ const Page = () => {
       ) : null}
 
       {isConnected && !token && error ? (
-        <div className="h-36 w-36">
+        <div id="ERROR" className="h-36 w-36">
           <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle
               cx="44"
@@ -218,7 +235,11 @@ const Page = () => {
       ) : null}
 
       {isConnected && !token && !error ? (
-        <div className="h-36 w-36 cursor-pointer" onClick={handleAuthorize}>
+        <div
+          id="CONNECTED_NOT_AUTHORIZED"
+          className="h-36 w-36 cursor-pointer"
+          onClick={handleAuthorize}
+        >
           <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle
               cx="44"
@@ -241,7 +262,7 @@ const Page = () => {
       ) : null}
 
       {isConnected && token && !error ? (
-        <div className="h-36 w-36">
+        <div id="CONNECTED_AND_AUTHORIZED" className="h-36 w-36">
           <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle
               cx="44"
