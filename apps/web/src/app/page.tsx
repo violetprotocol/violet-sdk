@@ -76,7 +76,7 @@ const ERROR_COLOR = "#dc2626";
 const LOCAL_API_URL = "http://localhost:8080";
 
 const Page = () => {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { chain } = useNetwork();
   const { connect } = useConnect({
     connector: new InjectedConnector(),
@@ -123,6 +123,8 @@ const Page = () => {
   const { authorize } = useViolet({
     redirectUrl: redirectUrl,
     clientId: clientId,
+    chainId: chain?.id,
+    address: address,
     apiUrl: apiUrl,
   });
 
@@ -131,6 +133,14 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
+    const params = {};
+
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+
+    if (Object.keys(params).length === 0) return;
+
     const token = searchParams.get("token");
 
     const error = searchParams.get("error_code");
@@ -142,14 +152,6 @@ const Page = () => {
     if (token) {
       setToken(token);
     }
-
-    const params = {};
-
-    for (const [key, value] of searchParams.entries()) {
-      params[key] = value;
-    }
-
-    if (Object.keys(params).length === 0) return;
 
     console.table(params);
 
