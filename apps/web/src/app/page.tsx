@@ -61,7 +61,6 @@ const getHumanBoundContractAddressByNetworkId = (chainId: number) => {
 };
 
 // This will be generated from Violet
-const REDIRECT_URL = "http://localhost:3000";
 const CLIENT_ID =
   "be7cbd47d3b070de1dd56185b2e9bd51cdf73491e333a86bb98885c1364b1214";
 
@@ -96,7 +95,7 @@ const Page = () => {
     useState<string>(
       getHumanBoundContractAddressByNetworkId(chainIds.arbitrum_goerli)
     );
-  const [redirectUrl, setRedirectUrl] = useState<string>(REDIRECT_URL);
+  const [redirectUrl, setRedirectUrl] = useState<string>();
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
   const [network, setNetwork] = useState<number>(chainIds.arbitrum_goerli);
 

@@ -1,6 +1,28 @@
 import { useCallback, useEffect } from "react";
-import { API_URL } from "../constants";
-import { useModal } from "../stores/modals";
+import { API_URL, VIOLET_CALLBACK_URL } from "../constants";
+
+const generatePopup = ({ url, id }: { url: string; id: string }) => {
+  const popup = window.open(
+    url,
+    id,
+    `
+    toolbar=no,
+    location=no,
+    directories=no,
+    status=no,
+    menubar=no,
+    scrollbars=no,
+    resizable=no,
+    copyhistory=no,
+    width=600,
+    height=800
+    `
+  );
+
+  if (popup) popup.focus();
+
+  return popup;
+};
 
 const useViolet = ({
   clientId,
@@ -10,26 +32,22 @@ const useViolet = ({
   apiUrl = API_URL,
 }: {
   clientId: string;
-  redirectUrl: string;
+  redirectUrl?: string;
   address: string;
   chainId: number;
   apiUrl?: string;
 }) => {
-  const setOpenModal = useModal((state) => state.setOpenModal);
-
   const handlePostMessage = useCallback(
-    async (event: MessageEvent) => {
-      if (event.origin !== apiUrl) return;
+    async ({ origin, data }: MessageEvent<any>) => {
+      if (origin !== new URL(apiUrl).origin) return;
 
-      console.log(event.data);
-
-      setOpenModal(null);
+      console.log(data);
     },
-    [apiUrl, setOpenModal]
+    []
   );
 
   useEffect(() => {
-    window.addEventListener("message", handlePostMessage, false);
+    window.addEventListener("message", handlePostMessage);
 
     return () => {
       window.removeEventListener("message", handlePostMessage);
@@ -48,6 +66,8 @@ const useViolet = ({
         targetContract: string;
       };
     }) => {
+      if (typeof window === "undefined") return;
+
       const parsedApiUrl = new URL(apiUrl);
 
       const url = new URL(`${parsedApiUrl.toString()}api/authz/authorize`);
@@ -67,26 +87,22 @@ const useViolet = ({
 
       url.searchParams.append("tx_data", transaction.data);
 
-      url.searchParams.append("redirect_uri", redirectUrl);
+      if (redirectUrl) {
+        url.searchParams.append("redirect_uri", redirectUrl);
+      } else {
+        url.searchParams.append("redirect_uri", VIOLET_CALLBACK_URL);
+      }
 
       url.searchParams.append("client_id", clientId);
 
-      setOpenModal({
-        name: "AUTHORIZATION",
-        metadata: {
-          url: url.toString(),
-        },
+      const popup = generatePopup({
+        url: url.toString(),
+        id: crypto.randomUUID(),
       });
 
-      // if (typeof window !== "undefined") {
-      //   window.location.href = url.toString();
-
-      //   return;
-      // }
-
-      // throw new Error("WINDOW_NOT_AVAILABLE");
+      if (!popup) throw new Error("POPUP_NOT_AVAILABLE");
     },
-    [address, apiUrl, chainId, clientId, redirectUrl, setOpenModal]
+    [address, apiUrl, chainId, clientId, redirectUrl]
   );
 
   return { authorize };
