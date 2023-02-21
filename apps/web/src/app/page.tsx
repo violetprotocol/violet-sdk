@@ -74,6 +74,8 @@ const ERROR_COLOR = "#dc2626";
 
 const LOCAL_API_URL = "http://localhost:8080";
 
+const REDIRECT_URL = "http://localhost:3000/callback";
+
 const Page = () => {
   const { isConnected, address } = useAccount();
   const { chain } = useNetwork();
@@ -95,7 +97,7 @@ const Page = () => {
     useState<string>(
       getHumanBoundContractAddressByNetworkId(chainIds.arbitrum_goerli)
     );
-  const [redirectUrl, setRedirectUrl] = useState<string>();
+  const [redirectUrl, setRedirectUrl] = useState<string>(REDIRECT_URL);
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
   const [network, setNetwork] = useState<number>(chainIds.arbitrum_goerli);
 
@@ -122,8 +124,6 @@ const Page = () => {
   const { authorize } = useViolet({
     redirectUrl: redirectUrl,
     clientId: clientId,
-    chainId: chain?.id,
-    address: address,
     apiUrl: apiUrl,
   });
 
@@ -168,13 +168,27 @@ const Page = () => {
   if (!hasMounted) return null;
 
   const handleAuthorize = async () => {
-    await authorize({
+    const response = await authorize({
       transaction: {
         data: transactionData,
         functionSignature: transactionFunctionSignature,
         targetContract: transactionTargetContract,
       },
+      chainId: chain.id,
+      address: address,
     });
+
+    if (!response) return;
+
+    const [token, error] = response;
+
+    if (error) {
+      setError(error);
+    }
+
+    if (token) {
+      setToken(token);
+    }
   };
 
   const handleConnect = async () => {

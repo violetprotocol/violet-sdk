@@ -1,109 +1,176 @@
-import { useCallback, useEffect } from "react";
-import { API_URL, VIOLET_CALLBACK_URL } from "../constants";
+import { useEffect } from "react";
+import { API_URL, VIOLET_STORAGE_KEY } from "../constants";
 
-const generatePopup = ({ url, id }: { url: string; id: string }) => {
+const mode = {
+  REDIRECT: "redirect",
+  POPUP: "popup",
+} as const;
+
+type BaseProps = {
+  clientId: string;
+  apiUrl?: string;
+  redirectUrl: string;
+};
+
+type RedirectOptions = {
+  mode: typeof mode.REDIRECT;
+};
+
+type RedirectProps = BaseProps & {
+  options?: RedirectOptions;
+};
+
+type PopupOptions = {
+  mode: typeof mode.POPUP;
+  focus?: boolean;
+};
+
+type PopupProps = BaseProps & {
+  options?: PopupOptions;
+};
+
+type Props = RedirectProps | PopupProps;
+
+type AuthorizeProps = {
+  address: string;
+  chainId: number;
+  state?: string;
+  transaction: {
+    functionSignature: string;
+    data: string;
+    targetContract: string;
+  };
+};
+
+type AuthorizeResponse =
+  | {
+      onChainTokenId: string;
+      token: string;
+      tx_id: string;
+    }
+  | {
+      error_code: string;
+      tx_id: string;
+    };
+
+const generatePopup = ({
+  url,
+  id,
+  options,
+}: {
+  url: string;
+  id: string;
+  options?: PopupOptions;
+}) => {
   const popup = window.open(
     url,
     id,
     `
-    toolbar=no,
-    location=no,
-    directories=no,
-    status=no,
-    menubar=no,
-    scrollbars=no,
-    resizable=no,
-    copyhistory=no,
-    width=600,
-    height=800
-    `
+        toolbar=no,
+        location=no,
+        directories=no,
+        status=no,
+        menubar=no,
+        scrollbars=no,
+        resizable=no,
+        copyhistory=no,
+        width=600,
+        height=800
+        `
   );
 
-  if (popup) popup.focus();
+  if (popup && options?.focus) popup.focus();
 
   return popup;
+};
+
+const handleRedirect = ({ url }: { url: string }) => {
+  window.location.href = url;
 };
 
 const useViolet = ({
   clientId,
   redirectUrl,
-  address,
-  chainId,
   apiUrl = API_URL,
-}: {
-  clientId: string;
-  redirectUrl?: string;
-  address: string;
-  chainId: number;
-  apiUrl?: string;
-}) => {
-  const handlePostMessage = useCallback(
-    async ({ origin, data }: MessageEvent<any>) => {
-      if (origin !== new URL(apiUrl).origin) return;
+  options = {
+    mode: "popup",
+  },
+}: Props) => {
+  const authorize = async ({
+    state,
+    transaction,
+    address,
+    chainId,
+  }: AuthorizeProps): Promise<[string | null, string | null] | void> => {
+    if (typeof window === "undefined") return;
 
-      console.log(data);
-    },
-    []
-  );
+    const parsedApiUrl = new URL(apiUrl);
 
-  useEffect(() => {
-    window.addEventListener("message", handlePostMessage);
+    const url = new URL(`${parsedApiUrl.toString()}api/authz/authorize`);
 
-    return () => {
-      window.removeEventListener("message", handlePostMessage);
-    };
-  }, [handlePostMessage]);
+    url.searchParams.append("account_id", `eip155:${chainId}:${address}`);
 
-  const authorize = useCallback(
-    async ({
-      state,
-      transaction,
-    }: {
-      state?: string;
-      transaction: {
-        functionSignature: string;
-        data: string;
-        targetContract: string;
-      };
-    }) => {
-      if (typeof window === "undefined") return;
+    if (state) {
+      url.searchParams.append("dapp_state", state);
+    }
 
-      const parsedApiUrl = new URL(apiUrl);
+    url.searchParams.append("tx_target_contract", transaction.targetContract);
 
-      const url = new URL(`${parsedApiUrl.toString()}api/authz/authorize`);
+    url.searchParams.append(
+      "tx_function_signature",
+      transaction.functionSignature
+    );
 
-      url.searchParams.append("account_id", `eip155:${chainId}:${address}`);
+    url.searchParams.append("tx_data", transaction.data);
 
-      if (state) {
-        url.searchParams.append("dapp_state", state);
-      }
+    url.searchParams.append("client_id", clientId);
 
-      url.searchParams.append("tx_target_contract", transaction.targetContract);
+    url.searchParams.append("redirect_uri", redirectUrl);
 
-      url.searchParams.append(
-        "tx_function_signature",
-        transaction.functionSignature
-      );
-
-      url.searchParams.append("tx_data", transaction.data);
-
-      if (redirectUrl) {
-        url.searchParams.append("redirect_uri", redirectUrl);
-      } else {
-        url.searchParams.append("redirect_uri", VIOLET_CALLBACK_URL);
-      }
-
-      url.searchParams.append("client_id", clientId);
-
+    if (options.mode === "popup") {
       const popup = generatePopup({
         url: url.toString(),
         id: crypto.randomUUID(),
+        options,
       });
 
-      if (!popup) throw new Error("POPUP_NOT_AVAILABLE");
-    },
-    [address, apiUrl, chainId, clientId, redirectUrl]
-  );
+      if (!popup) {
+        console.error("POPUP_NOT_AVAILABLE");
+
+        handleRedirect({ url: url.toString() });
+
+        return;
+      }
+
+      return new Promise((resolve, reject) => {
+        const interval = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(interval);
+
+            const raw = localStorage.getItem(VIOLET_STORAGE_KEY);
+
+            if (!raw) {
+              return;
+            }
+
+            const violet = JSON.parse(raw) as AuthorizeResponse;
+
+            if ("error_code" in violet) {
+              return reject([null, violet.error_code.toUpperCase()]);
+            }
+
+            localStorage.removeItem(VIOLET_STORAGE_KEY);
+
+            return resolve([violet.token, null]);
+          }
+        }, 200);
+      });
+    }
+
+    if (options.mode === "redirect") {
+      handleRedirect({ url: url.toString() });
+    }
+  };
 
   return { authorize };
 };
