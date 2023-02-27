@@ -61,7 +61,6 @@ const getHumanBoundContractAddressByNetworkId = (chainId: number) => {
 };
 
 // This will be generated from Violet
-const REDIRECT_URL = "http://localhost:3000";
 const CLIENT_ID =
   "be7cbd47d3b070de1dd56185b2e9bd51cdf73491e333a86bb98885c1364b1214";
 
@@ -75,8 +74,10 @@ const ERROR_COLOR = "#dc2626";
 
 const LOCAL_API_URL = "http://localhost:8080";
 
+const REDIRECT_URL = "http://localhost:3000/callback";
+
 const Page = () => {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { chain } = useNetwork();
   const { connect } = useConnect({
     connector: new InjectedConnector(),
@@ -85,7 +86,7 @@ const Page = () => {
   const router = useRouter();
 
   const [token, setToken] = useState<string>();
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
 
   const [apiUrl, setApiUrl] = useState<string>(LOCAL_API_URL);
@@ -126,54 +127,32 @@ const Page = () => {
     apiUrl: apiUrl,
   });
 
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const token = searchParams.get("token");
-
-    const error = searchParams.get("error_code");
-
-    if (error) {
-      setError(error);
-    }
-
-    if (token) {
-      setToken(token);
-    }
-
-    const params = {};
-
-    for (const [key, value] of searchParams.entries()) {
-      params[key] = value;
-    }
-
-    if (Object.keys(params).length === 0) return;
-
-    console.table(params);
-
-    router.replace("/");
-  }, [searchParams, router]);
-
-  useEffect(() => {
-    if (!chain) return;
-
-    if (chain.id === network) return;
-
-    setNetwork(chain.id);
-  }, [network, chain]);
-
-  if (!hasMounted) return null;
-
   const handleAuthorize = async () => {
-    await authorize({
+    // POPUP
+
+    const response = await authorize({
       transaction: {
         data: transactionData,
         functionSignature: transactionFunctionSignature,
         targetContract: transactionTargetContract,
       },
+      chainId: chain.id,
+      address: address,
     });
+
+    if (!response) return;
+
+    const [violet, error] = response;
+
+    if (error) {
+      console.error(error);
+
+      setError(true);
+    }
+
+    if (violet) {
+      setToken(violet.token);
+    }
   };
 
   const handleConnect = async () => {
@@ -195,6 +174,58 @@ const Page = () => {
 
     setFormOpen(false);
   });
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // REDIRECT
+
+    const params = {};
+
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+
+    if (Object.keys(params).length === 0) return;
+
+    const token = searchParams.get("token");
+
+    const error = searchParams.get("error_code");
+
+    if (error) {
+      console.error(error);
+
+      setError(true);
+    }
+
+    if (token) {
+      setToken(token);
+    }
+
+    console.table(params);
+
+    router.replace("/");
+  }, [searchParams, router]);
+
+  useEffect(() => {
+    if (!chain) return;
+
+    if (chain.id === network) return;
+
+    setNetwork(chain.id);
+  }, [network, chain]);
+
+  useEffect(() => {
+    if (!chain) return;
+
+    setError(false);
+
+    setToken(undefined);
+  }, [chain]);
+
+  if (!hasMounted) return null;
 
   return (
     <main className="flex h-screen justify-center items-center">
