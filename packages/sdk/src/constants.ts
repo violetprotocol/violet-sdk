@@ -1,5 +1,5 @@
 const API_URL = "https//app.violet.co";
 
-const VIOLET_STORAGE_KEY = "violet";
+const VIOLET_AUTHORIZE_KEY = "VIOLET_AUTHORIZE";
 
-export { API_URL, VIOLET_STORAGE_KEY };
+export { API_URL, VIOLET_AUTHORIZE_KEY };

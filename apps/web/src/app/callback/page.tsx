@@ -1,22 +1,24 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { VIOLET_AUTHORIZE_KEY } from "@violetprotocol/sdk";
 import { useEffect } from "react";
 
 const Callback = () => {
-  const searchParams = useSearchParams();
-
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+
     const params = {};
 
     for (const [key, value] of searchParams.entries()) {
       params[key] = value;
     }
 
-    localStorage.setItem("violet", JSON.stringify(params));
+    if (params.hasOwnProperty("tx_id")) {
+      localStorage.setItem(VIOLET_AUTHORIZE_KEY, JSON.stringify(params));
 
-    window.close();
-  }, [searchParams]);
+      window.close();
+    }
+  }, []);
 
   return null;
 };

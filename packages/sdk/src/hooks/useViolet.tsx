@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { API_URL, VIOLET_STORAGE_KEY } from "../constants";
+import { API_URL, VIOLET_AUTHORIZE_KEY } from "../constants";
 
 const mode = {
   REDIRECT: "redirect",
@@ -8,8 +7,8 @@ const mode = {
 
 type BaseProps = {
   clientId: string;
-  apiUrl?: string;
   redirectUrl: string;
+  apiUrl?: string;
 };
 
 type RedirectOptions = {
@@ -34,17 +33,16 @@ type Props = RedirectProps | PopupProps;
 type AuthorizeProps = {
   address: string;
   chainId: number;
-  state?: string;
   transaction: {
     functionSignature: string;
     data: string;
     targetContract: string;
   };
+  state?: string;
 };
 
-type AuthorizeResponse =
+type AuthorizeVioletResponse =
   | {
-      onChainTokenId: string;
       token: string;
       tx_id: string;
     }
@@ -52,6 +50,11 @@ type AuthorizeResponse =
       error_code: string;
       tx_id: string;
     };
+
+type AuthorizeResponse = [
+  { token: string; txId: string } | null,
+  { code: string; txId?: string } | null
+];
 
 const generatePopup = ({
   url,
@@ -101,7 +104,7 @@ const useViolet = ({
     transaction,
     address,
     chainId,
-  }: AuthorizeProps): Promise<[string | null, string | null] | void> => {
+  }: AuthorizeProps): Promise<AuthorizeResponse | void> => {
     if (typeof window === "undefined") return;
 
     const parsedApiUrl = new URL(apiUrl);
@@ -142,27 +145,39 @@ const useViolet = ({
         return;
       }
 
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const interval = setInterval(() => {
-          if (popup.closed) {
+          window.addEventListener("storage", (event) => {
+            if (event.key !== VIOLET_AUTHORIZE_KEY) return;
+
             clearInterval(interval);
 
-            const raw = localStorage.getItem(VIOLET_STORAGE_KEY);
+            if (!event.isTrusted) {
+              return resolve([null, { code: "EVENT_NOT_TRUSTED" }]);
+            }
+
+            const raw = event.newValue;
+
+            localStorage.removeItem(VIOLET_AUTHORIZE_KEY);
 
             if (!raw) {
-              return;
+              return resolve([null, { code: "SOMETHING_WENT_WRONG" }]);
             }
 
-            const violet = JSON.parse(raw) as AuthorizeResponse;
+            const violet = JSON.parse(raw) as AuthorizeVioletResponse;
 
             if ("error_code" in violet) {
-              return reject([null, violet.error_code.toUpperCase()]);
+              return resolve([
+                null,
+                {
+                  code: violet.error_code.toUpperCase(),
+                  txId: violet.tx_id,
+                },
+              ]);
             }
 
-            localStorage.removeItem(VIOLET_STORAGE_KEY);
-
-            return resolve([violet.token, null]);
-          }
+            return resolve([{ token: violet.token, txId: violet.tx_id }, null]);
+          });
         }, 200);
       });
     }

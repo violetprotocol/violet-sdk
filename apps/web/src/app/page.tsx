@@ -86,7 +86,7 @@ const Page = () => {
   const router = useRouter();
 
   const [token, setToken] = useState<string>();
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
 
   const [apiUrl, setApiUrl] = useState<string>(LOCAL_API_URL);
@@ -127,47 +127,9 @@ const Page = () => {
     apiUrl: apiUrl,
   });
 
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const params = {};
-
-    for (const [key, value] of searchParams.entries()) {
-      params[key] = value;
-    }
-
-    if (Object.keys(params).length === 0) return;
-
-    const token = searchParams.get("token");
-
-    const error = searchParams.get("error_code");
-
-    if (error) {
-      setError(error);
-    }
-
-    if (token) {
-      setToken(token);
-    }
-
-    console.table(params);
-
-    router.replace("/");
-  }, [searchParams, router]);
-
-  useEffect(() => {
-    if (!chain) return;
-
-    if (chain.id === network) return;
-
-    setNetwork(chain.id);
-  }, [network, chain]);
-
-  if (!hasMounted) return null;
-
   const handleAuthorize = async () => {
+    // POPUP
+
     const response = await authorize({
       transaction: {
         data: transactionData,
@@ -180,14 +142,16 @@ const Page = () => {
 
     if (!response) return;
 
-    const [token, error] = response;
+    const [violet, error] = response;
 
     if (error) {
-      setError(error);
+      console.error(error);
+
+      setError(true);
     }
 
-    if (token) {
-      setToken(token);
+    if (violet) {
+      setToken(violet.token);
     }
   };
 
@@ -210,6 +174,58 @@ const Page = () => {
 
     setFormOpen(false);
   });
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // REDIRECT
+
+    const params = {};
+
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+
+    if (Object.keys(params).length === 0) return;
+
+    const token = searchParams.get("token");
+
+    const error = searchParams.get("error_code");
+
+    if (error) {
+      console.error(error);
+
+      setError(true);
+    }
+
+    if (token) {
+      setToken(token);
+    }
+
+    console.table(params);
+
+    router.replace("/");
+  }, [searchParams, router]);
+
+  useEffect(() => {
+    if (!chain) return;
+
+    if (chain.id === network) return;
+
+    setNetwork(chain.id);
+  }, [network, chain]);
+
+  useEffect(() => {
+    if (!chain) return;
+
+    setError(false);
+
+    setToken(undefined);
+  }, [chain]);
+
+  if (!hasMounted) return null;
 
   return (
     <main className="flex h-screen justify-center items-center">
