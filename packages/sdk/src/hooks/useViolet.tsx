@@ -107,9 +107,7 @@ const useViolet = ({
   }: AuthorizeProps): Promise<AuthorizeResponse | void> => {
     if (typeof window === "undefined") return;
 
-    const parsedApiUrl = new URL(apiUrl);
-
-    const url = new URL(`${parsedApiUrl.toString()}api/authz/authorize`);
+    const url = new URL("api/authz/authorize", apiUrl);
 
     url.searchParams.append("account_id", `eip155:${chainId}:${address}`);
 
