@@ -142,7 +142,7 @@ const Page = () => {
 
     if (!response) return;
 
-    const [violet, error] = response;
+    const [eat, error] = response;
 
     if (error) {
       console.error(error);
@@ -150,8 +150,8 @@ const Page = () => {
       setError(true);
     }
 
-    if (violet) {
-      setToken(violet.token);
+    if (eat) {
+      setToken(eat.token);
     }
   };
 

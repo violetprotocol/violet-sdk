@@ -1,4 +1,9 @@
-import { API_URL, VIOLET_AUTHORIZE_KEY } from "../constants";
+import {
+  API_URL,
+  AUTHORIZE_ENDPOINT,
+  ETHEREUM_NAMESPACE,
+  VIOLET_AUTHORIZATION_JSON,
+} from "../constants";
 
 const mode = {
   REDIRECT: "redirect",
@@ -91,6 +96,8 @@ const handleRedirect = ({ url }: { url: string }) => {
   window.location.href = url;
 };
 
+const TIMEOUT = 60 * 60 * 1000;
+
 const useViolet = ({
   clientId,
   redirectUrl,
@@ -107,9 +114,12 @@ const useViolet = ({
   }: AuthorizeProps): Promise<AuthorizeResponse | void> => {
     if (typeof window === "undefined") return;
 
-    const url = new URL("api/authz/authorize", apiUrl);
+    const url = new URL(AUTHORIZE_ENDPOINT, apiUrl);
 
-    url.searchParams.append("account_id", `eip155:${chainId}:${address}`);
+    url.searchParams.append(
+      "account_id",
+      `${ETHEREUM_NAMESPACE}:${chainId}:${address}`
+    );
 
     if (state) {
       url.searchParams.append("dapp_state", state);
@@ -143,47 +153,56 @@ const useViolet = ({
         return;
       }
 
-      return new Promise((resolve) => {
-        const interval = setInterval(() => {
-          window.addEventListener(
-            "storage",
-            (event) => {
-              if (event.key !== VIOLET_AUTHORIZE_KEY) return;
+      return new Promise((resolve, reject) => {
+        let timer: number;
 
-              clearInterval(interval);
+        const listener = (event: StorageEvent) => {
+          if (event.key !== VIOLET_AUTHORIZATION_JSON) return;
 
-              if (!event.isTrusted) {
-                return resolve([null, { code: "EVENT_NOT_TRUSTED" }]);
-              }
+          clearTimeout(timer);
 
-              const raw = event.newValue;
+          removeEventListener("storage", listener);
 
-              localStorage.removeItem(VIOLET_AUTHORIZE_KEY);
+          if (!event.isTrusted) {
+            return resolve([null, { code: "EVENT_NOT_TRUSTED" }]);
+          }
 
-              if (!raw) {
-                return resolve([null, { code: "SOMETHING_WENT_WRONG" }]);
-              }
+          const raw = event.newValue;
 
-              const violet = JSON.parse(raw) as AuthorizeVioletResponse;
+          localStorage.removeItem(VIOLET_AUTHORIZATION_JSON);
 
-              if ("error_code" in violet) {
-                return resolve([
-                  null,
-                  {
-                    code: violet.error_code.toUpperCase(),
-                    txId: violet.tx_id,
-                  },
-                ]);
-              }
+          if (!raw) {
+            return resolve([null, { code: "SOMETHING_WENT_WRONG" }]);
+          }
 
-              return resolve([
-                { token: violet.token, txId: violet.tx_id },
-                null,
-              ]);
-            },
-            { once: true }
-          );
-        }, 200);
+          let violet: AuthorizeVioletResponse | void;
+
+          try {
+            violet = JSON.parse(raw) as AuthorizeVioletResponse;
+          } catch {
+            return reject(new Error("MALFORMED_RESPONSE"));
+          }
+
+          if ("error_code" in violet) {
+            return resolve([
+              null,
+              {
+                code: violet.error_code.toUpperCase(),
+                txId: violet.tx_id,
+              },
+            ]);
+          }
+
+          return resolve([{ token: violet.token, txId: violet.tx_id }, null]);
+        };
+
+        addEventListener("storage", listener);
+
+        timer = setTimeout(() => {
+          removeEventListener("storage", listener);
+
+          reject(new Error("TIMEOUT_ERROR"));
+        }, TIMEOUT);
       });
     }
 
