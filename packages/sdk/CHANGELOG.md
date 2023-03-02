@@ -1,5 +1,11 @@
 # @violetprotocol/sdk
 
+## 0.0.5
+
+### Patch Changes
+
+- 02e6e26: refactoring authorize method
+
 ## 0.0.2
 
 ### Patch Changes
