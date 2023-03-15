@@ -1,6 +1,6 @@
 "use client";
 
-import { VIOLET_AUTHORIZATION_JSON } from "@violetprotocol/sdk";
+import { VIOLET_AUTHORIZATION_CHANNEL } from "@violetprotocol/sdk";
 import { useEffect } from "react";
 
 const Callback = () => {
@@ -13,11 +13,11 @@ const Callback = () => {
       params[key] = value;
     }
 
-    if (params.hasOwnProperty("tx_id")) {
-      localStorage.setItem(VIOLET_AUTHORIZATION_JSON, JSON.stringify(params));
+    const channel = new BroadcastChannel(VIOLET_AUTHORIZATION_CHANNEL);
 
-      window.close();
-    }
+    channel.postMessage(params);
+
+    window.close();
   }, []);
 
   return null;

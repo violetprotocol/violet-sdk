@@ -2,7 +2,7 @@ import {
   API_URL,
   AUTHORIZE_ENDPOINT,
   ETHEREUM_NAMESPACE,
-  VIOLET_AUTHORIZATION_JSON,
+  VIOLET_AUTHORIZATION_CHANNEL,
 } from "../constants";
 
 const mode = {
@@ -96,8 +96,6 @@ const handleRedirect = ({ url }: { url: string }) => {
   window.location.href = url;
 };
 
-const TIMEOUT = 60 * 60 * 1000;
-
 const useViolet = ({
   clientId,
   redirectUrl,
@@ -138,6 +136,8 @@ const useViolet = ({
 
     url.searchParams.append("redirect_uri", redirectUrl);
 
+    const channel = new BroadcastChannel(VIOLET_AUTHORIZATION_CHANNEL);
+
     if (options.mode === "popup") {
       const popup = generatePopup({
         url: url.toString(),
@@ -154,55 +154,34 @@ const useViolet = ({
       }
 
       return new Promise((resolve, reject) => {
-        let timer: number;
-
-        const listener = (event: StorageEvent) => {
-          if (event.key !== VIOLET_AUTHORIZATION_JSON) return;
-
-          clearTimeout(timer);
-
-          removeEventListener("storage", listener);
-
+        const listener = (event: MessageEvent<AuthorizeVioletResponse>) => {
           if (!event.isTrusted) {
             return resolve([null, { code: "EVENT_NOT_TRUSTED" }]);
           }
 
-          const raw = event.newValue;
-
-          localStorage.removeItem(VIOLET_AUTHORIZATION_JSON);
-
-          if (!raw) {
-            return resolve([null, { code: "SOMETHING_WENT_WRONG" }]);
-          }
-
-          let violet: AuthorizeVioletResponse | void;
-
-          try {
-            violet = JSON.parse(raw) as AuthorizeVioletResponse;
-          } catch {
-            return reject(new Error("MALFORMED_RESPONSE"));
-          }
-
-          if ("error_code" in violet) {
+          if ("error_code" in event.data) {
             return resolve([
               null,
               {
-                code: violet.error_code.toUpperCase(),
-                txId: violet.tx_id,
+                code: event.data.error_code.toUpperCase(),
+                txId: event.data.tx_id,
               },
             ]);
           }
 
-          return resolve([{ token: violet.token, txId: violet.tx_id }, null]);
+          if ("token" in event.data) {
+            return resolve([
+              { token: event.data.token, txId: event.data.tx_id },
+              null,
+            ]);
+          }
+
+          return reject(new Error("UNKNOWN_ERROR"));
         };
 
-        addEventListener("storage", listener);
-
-        timer = setTimeout(() => {
-          removeEventListener("storage", listener);
-
-          reject(new Error("TIMEOUT_ERROR"));
-        }, TIMEOUT);
+        channel.addEventListener("message", listener, {
+          once: true,
+        });
       });
     }
 
