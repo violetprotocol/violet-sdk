@@ -1,5 +1,11 @@
 # @violetprotocol/sdk
 
+## 0.0.7
+
+### Patch Changes
+
+- 6c379cc: addding export for lib
+
 ## 0.0.6
 
 ### Patch Changes
