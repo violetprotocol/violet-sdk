@@ -14,16 +14,19 @@ const useViolet = ({ clientId, redirectUrl, apiUrl }: UseVioletProps) => {
       address,
       chainId,
       options,
-    }: AuthorizeProps) =>
+    }: Pick<
+      AuthorizeProps,
+      "state" | "transaction" | "address" | "chainId" | "options"
+    >) =>
       authorize({
         state,
         transaction,
         address,
         chainId,
+        options,
         clientId,
         redirectUrl,
         apiUrl,
-        options,
       }),
   };
 };
