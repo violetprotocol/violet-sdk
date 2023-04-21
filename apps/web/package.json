@@ -12,27 +12,27 @@
     "@radix-ui/react-dialog": "^1.0.3",
     "@radix-ui/react-label": "^2.0.1",
     "@violetprotocol/sdk": "workspace:*",
-    "@wagmi/core": "^0.10.1",
-    "class-variance-authority": "^0.4.0",
+    "@wagmi/core": "^0.10.10",
+    "class-variance-authority": "^0.5.2",
     "clsx": "^1.2.1",
     "ethers": "5",
-    "lucide-react": "^0.125.0",
-    "next": "^13.2.4",
+    "lucide-react": "^0.171.0",
+    "next": "^13.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.43.5",
-    "tailwind-merge": "^1.10.0",
-    "wagmi": "^0.12.1"
+    "react-hook-form": "^7.43.9",
+    "tailwind-merge": "^1.12.0",
+    "wagmi": "^0.12.12"
   },
   "devDependencies": {
-    "@types/node": "^18.15.3",
-    "@types/react": "^18.0.28",
+    "@types/node": "^18.15.13",
+    "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",
     "autoprefixer": "^10.4.14",
     "eslint-config-custom": "workspace:*",
-    "postcss": "^8.4.21",
-    "tailwindcss": "^3.2.7",
+    "postcss": "^8.4.23",
+    "tailwindcss": "^3.3.1",
     "tsconfig": "workspace:*",
-    "typescript": "^4.9.5"
+    "typescript": "^5.0.4"
   }
 }
