@@ -39,22 +39,12 @@ const chainIds = {
   polygon: polygon.id,
 } as const;
 
-const getHumanBoundContractAddressByNetworkId = (chainId: number) => {
+const getMauvePositionManagerByContractAddressByNetworkId = (
+  chainId: number
+) => {
   switch (chainId) {
-    case chainIds.mainnet:
-      return "0x594e5550ece2c10e5d580e538871914f55884f5d";
-    case chainIds.arbitrum_goerli:
-      return "0x8d39fe83ed158f1b7e21a6434e0878d6c11f02b9";
-    case chainIds.arbitrum:
-      return "0x5beb956a9af054956c5c6c0afac7b109236f86aa";
-    case chainIds.polygon_mumbai:
-      return "0x1888649d566908e0a4ac17978740f6a04f600a51";
     case chainIds.optimism_goerli:
-      return "0x5e5007bdd3eb92575499e17eabdd411b42cf79c0";
-    case chainIds.optimism:
-      return "0xff439ba52825ffd65e39fd2bf519566d0cd91827";
-    case chainIds.polygon:
-      return "0x41be3a6c17cf76442d9e7b150de4870027d36f52";
+      return "0xD2678cF600262057f485d12aD8F7c8FB5941EB46";
     default:
       throw new Error("Not supported chainId");
   }
@@ -95,11 +85,13 @@ const Page = () => {
     useState<string>(TX_FUNCTION_SIGNATURE);
   const [transactionTargetContract, setTransactionTargetContract] =
     useState<string>(
-      getHumanBoundContractAddressByNetworkId(chainIds.arbitrum_goerli)
+      getMauvePositionManagerByContractAddressByNetworkId(
+        chainIds.optimism_goerli
+      )
     );
   const [redirectUrl, setRedirectUrl] = useState<string>(REDIRECT_URL);
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
-  const [network, setNetwork] = useState<number>(chainIds.arbitrum_goerli);
+  const [network, setNetwork] = useState<number>(chainIds.optimism_goerli);
 
   const { register, handleSubmit } = useForm<{
     apiUrl: string;
@@ -151,7 +143,7 @@ const Page = () => {
     }
 
     if (eat) {
-      setToken(eat.token);
+      setToken(eat.rawEAT);
     }
   };
 
