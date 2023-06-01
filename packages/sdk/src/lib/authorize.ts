@@ -5,7 +5,7 @@ import {
   ETHEREUM_NAMESPACE,
   VIOLET_AUTHORIZATION_CHANNEL,
 } from "../constants";
-import { UseVioletProps } from "../hooks";
+import { VioletConfigParams } from "../types";
 
 const mode = {
   REDIRECT: "redirect",
@@ -21,7 +21,7 @@ type PopupOptions = {
   focus?: boolean;
 };
 
-type AuthorizeProps = UseVioletProps & {
+type AuthorizeProps = VioletConfigParams & {
   address: string;
   chainId: number;
   transaction: {
@@ -48,7 +48,7 @@ type EAT = {
   expiry: number;
 };
 
-type AuthorizeResponse = [
+export type AuthorizeResponse = [
   { rawEAT: string; txId: string; eat: EAT } | null,
   { code: string; txId?: string } | null
 ];
