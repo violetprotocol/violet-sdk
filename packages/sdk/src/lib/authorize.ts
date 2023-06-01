@@ -1,3 +1,4 @@
+import { Signature, splitSignature } from "@ethersproject/bytes";
 import {
   API_URL,
   AUTHORIZE_ENDPOINT,
@@ -42,8 +43,13 @@ type AuthorizeVioletResponse =
       tx_id: string;
     };
 
+type EAT = {
+  signature: Signature;
+  expiry: number;
+};
+
 type AuthorizeResponse = [
-  { token: string; txId: string } | null,
+  { rawEAT: string; txId: string; eat: EAT } | null,
   { code: string; txId?: string } | null
 ];
 
@@ -154,8 +160,27 @@ const authorize = async ({
         }
 
         if ("token" in event.data) {
+          let eat = event.data.token;
+          const parsedEAT = JSON.parse(atob(eat));
+
+          if (!parsedEAT?.signature || !parsedEAT?.expiry) {
+            return resolve([
+              null,
+              {
+                code: "EAT_PARSING_FAILED",
+                txId: event.data.tx_id,
+              },
+            ]);
+          }
+
+          const signature = splitSignature(parsedEAT.signature);
+
           return resolve([
-            { token: event.data.token, txId: event.data.tx_id },
+            {
+              rawEAT: event.data.token,
+              txId: event.data.tx_id,
+              eat: { signature, expiry: parsedEAT.expiry },
+            },
             null,
           ]);
         }
