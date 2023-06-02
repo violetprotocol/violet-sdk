@@ -47,7 +47,7 @@ type AuthorizeResponse = [
   { code: string; txId?: string } | null
 ];
 
-const VIOLET_CONTEXT = "violet";
+const VIOLET_CONTEXT = "violet_popup";
 
 const generatePopup = ({
   url,
