@@ -47,18 +47,18 @@ type AuthorizeResponse = [
   { code: string; txId?: string } | null
 ];
 
+const VIOLET_CONTEXT = "violet";
+
 const generatePopup = ({
   url,
-  id,
   options,
 }: {
   url: string;
-  id: string;
   options?: PopupOptions;
 }) => {
   const popup = window.open(
     url,
-    id,
+    VIOLET_CONTEXT,
     `
           toolbar=no,
           location=no,
@@ -125,7 +125,6 @@ const authorize = async ({
   if (options.mode === "popup") {
     const popup = generatePopup({
       url: url.toString(),
-      id: crypto.randomUUID(),
       options,
     });
 
