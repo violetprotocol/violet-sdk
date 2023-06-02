@@ -1,12 +1,7 @@
 import { AuthorizeProps, authorize } from "../lib";
+import { VioletConfigParams } from "../types";
 
-type UseVioletProps = {
-  clientId: string;
-  redirectUrl: string;
-  apiUrl?: string;
-};
-
-const useViolet = ({ clientId, redirectUrl, apiUrl }: UseVioletProps) => {
+const useViolet = ({ clientId, redirectUrl, apiUrl }: VioletConfigParams) => {
   return {
     authorize: async ({
       state,
@@ -30,7 +25,5 @@ const useViolet = ({ clientId, redirectUrl, apiUrl }: UseVioletProps) => {
       }),
   };
 };
-
-export type { UseVioletProps };
 
 export { useViolet };

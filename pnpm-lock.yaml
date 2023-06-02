@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
@@ -109,6 +113,10 @@ importers:
         version: 7.32.2(eslint@8.38.0)
 
   packages/sdk:
+    dependencies:
+      '@ethersproject/bytes':
+        specifier: ^5.7.0
+        version: 5.7.0
     devDependencies:
       '@types/react':
         specifier: ^18.0.37
