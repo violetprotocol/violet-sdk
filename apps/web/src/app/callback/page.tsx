@@ -20,7 +20,11 @@ const Callback = () => {
     window.close();
   }, []);
 
-  return null;
+  return (
+    <div className="h-screen flex items-center justify-center">
+      You can close this window now
+    </div>
+  );
 };
 
 export default Callback;

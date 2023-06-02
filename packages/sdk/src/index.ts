@@ -6,4 +6,6 @@ export * from "./constants";
 
 export * from "./lib";
 
+export * from "./utils";
+
 export * from "./types";

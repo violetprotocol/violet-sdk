@@ -88,6 +88,25 @@ const handleRedirect = ({ url }: { url: string }) => {
   window.location.href = url;
 };
 
+/**
+ * Initiates the authorization process by either redirecting to the authorization URL
+ * or opening it in a popup, depending on the provided options.
+ * This function is only available in a browser environment.
+ *
+ * @async
+ * @function authorize
+ * @param {Object} options - The authorization parameters and options.
+ * @param {string} options.state - An optional state parameter to maintain state between the request and callback.
+ * @param {Object} options.transaction - Contains functionSignature, data, targetContract for the transaction.
+ * @param {string} options.address - The address of the user.
+ * @param {number} options.chainId - The chain ID for the transaction.
+ * @param {string} options.clientId - The client ID for the application.
+ * @param {string} options.redirectUrl - The URL to redirect to after authorization.
+ * @param {string} [options.apiUrl=API_URL] - The URL of the API for authorization. Defaults to API_URL.
+ * @param {Object} [options.options=DEFAULT_OPTIONS] - The options for the authorization request. Defaults to DEFAULT_OPTIONS.
+ * @returns {Promise<AuthorizeResponse|void>} - A promise that resolves to an array with two elements. The first element is an object with `token` and `txId` if authorization was successful or `null` if not. The second element is an object with `code` and `txId` if there was an error or `null` if not. If the function is run outside of a browser environment, the function returns `undefined`.
+ * @throws - If an unknown error occurs.
+ */
 const authorize = async ({
   state,
   transaction,
@@ -96,37 +115,25 @@ const authorize = async ({
   clientId,
   redirectUrl,
   apiUrl = API_URL,
-  options = {
-    mode: "popup",
-  },
+  options = DEFAULT_OPTIONS,
 }: AuthorizeProps): Promise<AuthorizeResponse | void> => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") {
+    console.warn("AUTHORIZE_ONLY_AVAILABLE_IN_BROWSER");
 
-  const url = new URL(AUTHORIZE_ENDPOINT, apiUrl);
-
-  url.searchParams.append(
-    "account_id",
-    `${ETHEREUM_NAMESPACE}:${chainId}:${address}`
-  );
-
-  if (state) {
-    url.searchParams.append("dapp_state", state);
+    return;
   }
 
-  url.searchParams.append("tx_target_contract", transaction.targetContract);
-
-  url.searchParams.append(
-    "tx_function_signature",
-    transaction.functionSignature
-  );
-
-  url.searchParams.append("tx_data", transaction.data);
-
-  url.searchParams.append("client_id", clientId);
-
-  url.searchParams.append("redirect_uri", redirectUrl);
-
   const channel = new BroadcastChannel(VIOLET_AUTHORIZATION_CHANNEL);
+
+  const url = buildAuthorizationUrl({
+    state,
+    transaction,
+    address,
+    chainId,
+    clientId,
+    redirectUrl,
+    apiUrl,
+  });
 
   if (options.mode === "popup") {
     const popup = generatePopup({
@@ -135,15 +142,17 @@ const authorize = async ({
     });
 
     if (!popup) {
-      console.error("POPUP_NOT_AVAILABLE");
+      console.warn("POPUP_NOT_AVAILABLE_FALLBACK_REDIRECT");
 
-      handleRedirect({ url: url.toString() });
+      handleRedirect({ url });
 
       return;
     }
 
     return new Promise((resolve, reject) => {
       const listener = (event: MessageEvent<AuthorizeVioletResponse>) => {
+        popup.close();
+
         if (!event.isTrusted) {
           return resolve([null, { code: "EVENT_NOT_TRUSTED" }]);
         }
@@ -194,10 +203,10 @@ const authorize = async ({
   }
 
   if (options.mode === "redirect") {
-    handleRedirect({ url: url.toString() });
+    handleRedirect({ url });
   }
 };
 
 export type { AuthorizeProps };
 
-export { authorize };
+export { authorize, mode };

@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { WagmiConfig, createClient, configureChains } from "wagmi";
+import { WagmiConfig, createConfig, configureChains } from "wagmi";
 import {
   mainnet,
   arbitrumGoerli,
@@ -15,7 +15,7 @@ import { publicProvider } from "wagmi/providers/public";
 
 import { VioletProvider } from "@violetprotocol/sdk";
 
-const { provider, webSocketProvider } = configureChains(
+const { publicClient, webSocketPublicClient } = configureChains(
   [
     mainnet,
     arbitrumGoerli,
@@ -28,15 +28,15 @@ const { provider, webSocketProvider } = configureChains(
   [publicProvider()]
 );
 
-const client = createClient({
+const config = createConfig({
   autoConnect: true,
-  provider,
-  webSocketProvider,
+  publicClient,
+  webSocketPublicClient,
 });
 
 const Providers = ({ children }: { children: ReactNode }) => {
   return (
-    <WagmiConfig client={client}>
+    <WagmiConfig config={config}>
       <VioletProvider>{children}</VioletProvider>
     </WagmiConfig>
   );

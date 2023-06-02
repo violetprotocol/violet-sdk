@@ -1,33 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useAccount, useConnect, useNetwork } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
 import { useViolet } from "@violetprotocol/sdk";
 import {
-  mainnet,
-  arbitrumGoerli,
   arbitrum,
-  polygonMumbai,
-  optimismGoerli,
+  arbitrumGoerli,
+  mainnet,
   optimism,
+  optimismGoerli,
   polygon,
+  polygonMumbai,
 } from "@wagmi/core/chains";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useAccount, useConnect, useNetwork } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
+import { useForm } from "react-hook-form";
 import { Button } from "../components/Button";
-import { Label } from "../components/Label";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
-  DialogTitle,
   DialogDescription,
-  DialogHeader,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "../components/Dialog";
 import { Input } from "../components/Input";
-import { useForm } from "react-hook-form";
+import { Label } from "../components/Label";
 
 const chainIds = {
   mainnet: mainnet.id,
@@ -39,17 +39,6 @@ const chainIds = {
   polygon: polygon.id,
 } as const;
 
-const getMauvePositionManagerByContractAddressByNetworkId = (
-  chainId: number
-) => {
-  switch (chainId) {
-    case chainIds.optimism_goerli:
-      return "0xD2678cF600262057f485d12aD8F7c8FB5941EB46";
-    default:
-      throw new Error("Not supported chainId");
-  }
-};
-
 // This will be generated from Violet
 const CLIENT_ID =
   "be7cbd47d3b070de1dd56185b2e9bd51cdf73491e333a86bb98885c1364b1214";
@@ -58,6 +47,7 @@ const CLIENT_ID =
 const TX_FUNCTION_SIGNATURE = "0x50d41df3";
 const TX_DATA =
   "0x000000000000000000000000d00f7eddc37631bc7bd9ebad8265b2785465a3b7000000000000000000000000000000000000000000000000000000001adc34a100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000";
+const TX_CONTRACT_ADDRESS = "0xD2678cF600262057f485d12aD8F7c8FB5941EB46";
 
 const BRAND_COLOR = "#9a4cff";
 const ERROR_COLOR = "#dc2626";
@@ -84,11 +74,7 @@ const Page = () => {
   const [transactionFunctionSignature, setTransactionFunctionSignature] =
     useState<string>(TX_FUNCTION_SIGNATURE);
   const [transactionTargetContract, setTransactionTargetContract] =
-    useState<string>(
-      getMauvePositionManagerByContractAddressByNetworkId(
-        chainIds.optimism_goerli
-      )
-    );
+    useState<string>(TX_CONTRACT_ADDRESS);
   const [redirectUrl, setRedirectUrl] = useState<string>(REDIRECT_URL);
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
   const [network, setNetwork] = useState<number>(chainIds.optimism_goerli);
