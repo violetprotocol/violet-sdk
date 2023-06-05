@@ -1,91 +1,19 @@
-import { Signature, splitSignature } from "@ethersproject/bytes";
+import { splitSignature } from "@ethersproject/bytes";
+import { API_URL, VIOLET_AUTHORIZATION_CHANNEL } from "../constants";
 import {
-  API_URL,
-  AUTHORIZE_ENDPOINT,
-  ETHEREUM_NAMESPACE,
-  VIOLET_AUTHORIZATION_CHANNEL,
-} from "../constants";
-import { VioletConfigParams } from "../types";
-
-const mode = {
-  REDIRECT: "redirect",
-  POPUP: "popup",
-} as const;
-
-type RedirectOptions = {
-  mode: typeof mode.REDIRECT;
-};
-
-type PopupOptions = {
-  mode: typeof mode.POPUP;
-  focus?: boolean;
-};
-
-type AuthorizeProps = VioletConfigParams & {
-  address: string;
-  chainId: number;
-  transaction: {
-    functionSignature: string;
-    data: string;
-    targetContract: string;
-  };
-  state?: string;
-  options?: RedirectOptions | PopupOptions;
-};
-
-type AuthorizeVioletResponse =
-  | {
-      token: string;
-      tx_id: string;
-    }
-  | {
-      error_code: string;
-      tx_id: string;
-    };
-
-type EAT = {
-  signature: Signature;
-  expiry: number;
-};
-
-export type AuthorizeResponse = [
-  { rawEAT: string; txId: string; eat: EAT } | null,
-  { code: string; txId?: string } | null
-];
+  AuthorizeProps,
+  AuthorizeResponse,
+  AuthorizeVioletResponse,
+  PopupOptions,
+  RedirectOptions,
+} from "../types";
+import { buildAuthorizationUrl, generatePopup, handleRedirect } from "../utils";
+import { mode } from "../utils/mode";
 
 const VIOLET_CONTEXT = "violet_popup";
 
-const generatePopup = ({
-  url,
-  options,
-}: {
-  url: string;
-  options?: PopupOptions;
-}) => {
-  const popup = window.open(
-    url,
-    VIOLET_CONTEXT,
-    `
-          toolbar=no,
-          location=no,
-          directories=no,
-          status=no,
-          menubar=no,
-          scrollbars=no,
-          resizable=no,
-          copyhistory=no,
-          width=600,
-          height=800
-          `
-  );
-
-  if (popup && options?.focus) popup.focus();
-
-  return popup;
-};
-
-const handleRedirect = ({ url }: { url: string }) => {
-  window.location.href = url;
+const DEFAULT_OPTIONS: RedirectOptions | PopupOptions = {
+  mode: mode.POPUP,
 };
 
 /**
@@ -137,7 +65,8 @@ const authorize = async ({
 
   if (options.mode === "popup") {
     const popup = generatePopup({
-      url: url.toString(),
+      url: url,
+      id: VIOLET_CONTEXT,
       options,
     });
 
@@ -208,5 +137,4 @@ const authorize = async ({
 };
 
 export type { AuthorizeProps };
-
 export { authorize, mode };

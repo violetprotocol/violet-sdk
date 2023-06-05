@@ -34,6 +34,4 @@ const generatePopup = ({
   return popup;
 };
 
-export type { PopupOptions };
-
 export { generatePopup };
