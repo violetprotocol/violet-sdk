@@ -1,20 +1,19 @@
 "use client";
 
 import { useViolet } from "@violetprotocol/sdk";
-import {
-  arbitrum,
-  arbitrumGoerli,
-  mainnet,
-  optimism,
-  optimismGoerli,
-  polygon,
-  polygonMumbai,
-} from "@wagmi/core/chains";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAccount, useConnect, useNetwork } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
-
+import {
+  CHAIN_ID,
+  CLIENT_ID,
+  TX_FUNCTION_SIGNATURE,
+  TX_DATA,
+  TX_CONTRACT_ADDRESS,
+  LOCAL_API_URL,
+  REDIRECT_URL,
+} from "../constants";
 import { useForm } from "react-hook-form";
 import { Button } from "../components/Button";
 import {
@@ -29,32 +28,8 @@ import {
 import { Input } from "../components/Input";
 import { Label } from "../components/Label";
 
-const chainIds = {
-  mainnet: mainnet.id,
-  arbitrum_goerli: arbitrumGoerli.id,
-  arbitrum: arbitrum.id,
-  polygon_mumbai: polygonMumbai.id,
-  optimism_goerli: optimismGoerli.id,
-  optimism: optimism.id,
-  polygon: polygon.id,
-} as const;
-
-// This will be generated from Violet
-const CLIENT_ID =
-  "be7cbd47d3b070de1dd56185b2e9bd51cdf73491e333a86bb98885c1364b1214";
-
-// This will be generated from the ABI
-const TX_FUNCTION_SIGNATURE = "0x50d41df3";
-const TX_DATA =
-  "0x000000000000000000000000d00f7eddc37631bc7bd9ebad8265b2785465a3b7000000000000000000000000000000000000000000000000000000001adc34a100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000";
-const TX_CONTRACT_ADDRESS = "0xD2678cF600262057f485d12aD8F7c8FB5941EB46";
-
 const BRAND_COLOR = "#9a4cff";
 const ERROR_COLOR = "#dc2626";
-
-const LOCAL_API_URL = "http://localhost:8080";
-
-const REDIRECT_URL = "http://localhost:3000/callback";
 
 const Page = () => {
   const { isConnected, address } = useAccount();
@@ -77,7 +52,7 @@ const Page = () => {
     useState<string>(TX_CONTRACT_ADDRESS);
   const [redirectUrl, setRedirectUrl] = useState<string>(REDIRECT_URL);
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
-  const [network, setNetwork] = useState<number>(chainIds.optimism_goerli);
+  const [network, setNetwork] = useState<number>(CHAIN_ID.OPTIMISM_GOERLI);
 
   const { register, handleSubmit } = useForm<{
     apiUrl: string;
@@ -105,9 +80,8 @@ const Page = () => {
     apiUrl: apiUrl,
   });
 
+  // POPUP
   const handleAuthorize = async () => {
-    // POPUP
-
     const response = await authorize({
       transaction: {
         data: transactionData,
@@ -157,9 +131,8 @@ const Page = () => {
     setHasMounted(true);
   }, []);
 
+  // REDIRECT
   useEffect(() => {
-    // REDIRECT
-
     const params = {};
 
     for (const [key, value] of searchParams.entries()) {
