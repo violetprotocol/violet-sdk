@@ -1,5 +1,5 @@
-import React, { ButtonHTMLAttributes, forwardRef } from "react";
 import { VariantProps, cva } from "class-variance-authority";
+import React, { ButtonHTMLAttributes, forwardRef } from "react";
 
 import { cn } from "../lib/utils";
 

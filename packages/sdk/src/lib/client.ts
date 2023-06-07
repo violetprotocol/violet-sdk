@@ -1,28 +1,20 @@
-import { VioletConfigParams } from "../types";
 import {
-  AuthorizeProps,
-  AuthorizeResponse,
-  authorize as authorizeTx,
-} from "./authorize";
-
-type AuthorizePartialProps = Omit<
-  AuthorizeProps,
-  "clientId" | "redirectUrl" | "apiUrl"
->;
-
-type ConfiguredAuthorize = (
-  authorizePartialProps: AuthorizePartialProps
-) => Promise<AuthorizeResponse | void>;
+  AuthorizePartialProps,
+  ConfiguredAuthorize,
+  VioletConfigParams,
+} from "../types";
+import { authorize } from "./authorize";
 
 const createVioletClient = ({
   clientId,
   redirectUrl,
   apiUrl,
 }: VioletConfigParams): { authorize: ConfiguredAuthorize } => {
-  const authorize = async (authorizePartialProps: AuthorizePartialProps) =>
-    authorizeTx({ ...authorizePartialProps, clientId, redirectUrl, apiUrl });
+  const configuredAuthorize = async (
+    authorizePartialProps: AuthorizePartialProps
+  ) => authorize({ clientId, redirectUrl, apiUrl, ...authorizePartialProps });
 
-  return { authorize };
+  return { authorize: configuredAuthorize };
 };
 
 export { createVioletClient };
