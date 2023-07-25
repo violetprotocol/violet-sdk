@@ -14,7 +14,7 @@ const popupFeatures = `
   scrollbars=no,
   resizable=no,
   copyhistory=no,
-  width=600,
+  width=960,
   height=800
 `;
 

@@ -20,7 +20,7 @@ const CHAIN_ID = {
 
 // This will be generated from Violet
 const CLIENT_ID =
-  "be7cbd47d3b070de1dd56185b2e9bd51cdf73491e333a86bb98885c1364b1214";
+  "1212121212121212121212121212121212121212121212121212121212121214";
 
 // This will be generated from the ABI
 const TX_FUNCTION_SIGNATURE = "0x50d41df3";
