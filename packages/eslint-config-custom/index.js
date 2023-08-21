@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   extends: ["next", "turbo", "prettier"],
   rules: {
     "@next/next/no-html-link-for-pages": "off",
@@ -9,3 +9,5 @@ module.exports = {
     },
   },
 };
+
+export default config;

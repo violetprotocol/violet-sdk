@@ -14,7 +14,7 @@ import {
   LOCAL_API_URL,
   REDIRECT_URL,
 } from "../constants";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../components/Button";
 import {
   Dialog,
@@ -30,6 +30,15 @@ import { Label } from "../components/Label";
 
 const BRAND_COLOR = "#9a4cff";
 const ERROR_COLOR = "#dc2626";
+
+type FormValues = {
+  apiUrl: string;
+  transactionData: string;
+  transactionFunctionSignature: string;
+  transactionTargetContract: string;
+  redirectUrl: string;
+  clientId: string;
+};
 
 const Page = () => {
   const { isConnected, address } = useAccount();
@@ -54,14 +63,7 @@ const Page = () => {
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
   const [network, setNetwork] = useState<number>(CHAIN_ID.OPTIMISM_GOERLI);
 
-  const { register, handleSubmit } = useForm<{
-    apiUrl: string;
-    transactionData: string;
-    transactionFunctionSignature: string;
-    transactionTargetContract: string;
-    redirectUrl: string;
-    clientId: string;
-  }>({
+  const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       apiUrl,
       transactionData,
@@ -111,7 +113,7 @@ const Page = () => {
     await connect();
   };
 
-  const handleParametersSubmit = handleSubmit((data) => {
+  const handleParametersSubmit: SubmitHandler<FormValues> = (data) => {
     setApiUrl(data.apiUrl);
 
     setTransactionData(data.transactionData);
@@ -125,7 +127,7 @@ const Page = () => {
     setClientId(data.clientId);
 
     setFormOpen(false);
-  });
+  };
 
   useEffect(() => {
     setHasMounted(true);
@@ -273,7 +275,10 @@ const Page = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <form className="grid gap-4 py-4" onSubmit={handleParametersSubmit}>
+          <form
+            className="grid gap-4 py-4"
+            onSubmit={handleSubmit(handleParametersSubmit)}
+          >
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="apiUrl" className="text-right">
                 API URL
