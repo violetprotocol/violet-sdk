@@ -5,16 +5,16 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "clean": "turbo run clean",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "publish-packages": "turbo run build lint && changeset version && changeset publish",
     "ci:publish": "pnpm publish -r"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.26.1",
-    "eslint": "^8.40.0",
+    "@changesets/cli": "^2.26.2",
+    "eslint": "^8.47.0",
     "eslint-config-custom": "workspace:*",
-    "prettier": "^2.8.8",
-    "turbo": "^1.9.4"
+    "prettier": "^3.0.2",
+    "prettier-config-custom": "workspace:*",
+    "turbo": "^1.10.12"
   },
   "packageManager": "pnpm@7.15.0"
 }
