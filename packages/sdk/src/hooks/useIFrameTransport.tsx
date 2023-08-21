@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { RefObject, useEffect, useRef } from "react";
 import { IFrameTransport } from "../utils/iframeTransport";
@@ -9,7 +9,11 @@ interface UseIFrameTransportProps {
   targetRef: RefObject<any>;
 }
 
-export function useIFrameTransport({ requestExecutor, sourceRef, targetRef }: UseIFrameTransportProps) {
+export function useIFrameTransport({
+  requestExecutor,
+  sourceRef,
+  targetRef,
+}: UseIFrameTransportProps) {
   const transportRef = useRef<IFrameTransport | undefined>();
 
   useEffect(() => {
@@ -18,7 +22,10 @@ export function useIFrameTransport({ requestExecutor, sourceRef, targetRef }: Us
     if (!sourceRef?.current) return;
     if (!targetRef?.current) return;
 
-    transportRef.current = new IFrameTransport(requestExecutor, { eventSource: sourceRef.current, eventTarget: targetRef.current });
+    transportRef.current = new IFrameTransport(requestExecutor, {
+      eventSource: sourceRef.current,
+      eventTarget: targetRef.current,
+    });
     return () => transportRef.current?.cleanup();
   }, [sourceRef?.current, targetRef?.current]);
 

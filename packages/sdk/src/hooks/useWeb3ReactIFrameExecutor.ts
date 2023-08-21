@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 
 import { useWeb3React } from "@web3-react/core";
 import { RefObject, useEffect, useRef } from "react";
@@ -11,11 +11,14 @@ interface UseIFrameExecutorProps {
 
 /**
  * This should be used in the parent window to execute requests from the child window.
- * 
+ *
  * @param sourceRef - the parent `window` to which the child posts messages as requests
  * @param targetRef - the child `window` (iframe) to which the parent posts messages as replies
  */
-export function useWeb3ReactIFrameExecutor({ sourceRef, targetRef }: UseIFrameExecutorProps) {
+export function useWeb3ReactIFrameExecutor({
+  sourceRef,
+  targetRef,
+}: UseIFrameExecutorProps) {
   const ref_ = useRef<any>();
   const w3 = useWeb3React();
 
