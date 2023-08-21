@@ -3,18 +3,18 @@
 import { RefObject, useEffect, useRef } from "react";
 import { IFrameTransport } from "../utils/iframeTransport";
 
-interface UseIFrameTransportProps {
+type UseIFrameTransportProps = {
   requestExecutor: (request: any) => Promise<any>;
   sourceRef: RefObject<any>;
   targetRef: RefObject<any>;
-}
+};
 
-export function useIFrameTransport({
+const useIFrameTransport = ({
   requestExecutor,
   sourceRef,
   targetRef,
-}: UseIFrameTransportProps) {
-  const transportRef = useRef<IFrameTransport | undefined>();
+}: UseIFrameTransportProps) => {
+  const transportRef = useRef<IFrameTransport | null>(null);
 
   useEffect(() => {
     if (transportRef.current) transportRef.current.cleanup();
@@ -30,4 +30,6 @@ export function useIFrameTransport({
   }, [sourceRef?.current, targetRef?.current]);
 
   return transportRef;
-}
+};
+
+export { useIFrameTransport };

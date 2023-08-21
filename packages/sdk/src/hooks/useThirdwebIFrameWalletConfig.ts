@@ -1,12 +1,17 @@
 import { providers } from "ethers";
-import { AbstractClientWallet, Connector, WagmiAdapter, AsyncStorage } from "@thirdweb-dev/wallets";
+import {
+  AbstractClientWallet,
+  Connector,
+  WagmiAdapter,
+  AsyncStorage,
+} from "@thirdweb-dev/wallets";
 import { InjectedConnector } from "@thirdweb-dev/wallets/evm/connectors/injected";
 import { WalletConfig } from "@thirdweb-dev/react";
 import { useEffect, useRef } from "react";
 import { IFrameMessageKind, getUniqueId } from "../utils/iframeTransport";
 import { useIFrameTransport } from "./useIFrameTransport";
 
-export function useThirdwebIFrameWalletConfig() {
+const useThirdwebIFrameWalletConfig = () => {
   const sourceRef = useRef<any>();
   const targetRef = useRef<any>();
 
@@ -16,46 +21,51 @@ export function useThirdwebIFrameWalletConfig() {
   }, []);
 
   const transportRef = useIFrameTransport({
-    requestExecutor(request) {
-      console.log(`[useIFrameWalletConfig.requestExecutor]: `, request);
+    requestExecutor() {
       return Promise.resolve(true);
     },
+
     sourceRef,
     targetRef,
   });
 
   const request = (data: RequestProps): Promise<any> => {
-    console.log(`[useIFrameWalletConfig.request]: `, data);
-    return transportRef!.current!.executeRequest({
-      id: getUniqueId(),
-      kind: IFrameMessageKind.Request,
-      data,
-    }).then((data) => {
-      if (data.success) {
-        data = data.data;
-        console.log(`[CHILD WALLET RESPONSE] Success: `, data);
-        return data;
-      } else if (data.failure) {
-        const error = data.error;
+    return transportRef!
+      .current!.executeRequest({
+        id: getUniqueId(),
+        kind: IFrameMessageKind.Request,
+        data,
+      })
+      .then((data) => {
+        if (data.success) {
+          data = data.data;
+          console.log(`[CHILD WALLET RESPONSE] Success: `, data);
+          return data;
+        } else if (data.failure) {
+          const error = data.error;
+          console.log(`[CHILD WALLET RESPONSE] Failure: `, error);
+          throw error;
+        }
+      })
+      .catch((error) => {
         console.log(`[CHILD WALLET RESPONSE] Failure: `, error);
         throw error;
-      }
-    }).catch((error) => {
-      console.log(`[CHILD WALLET RESPONSE] Failure: `, error);
-      throw error;
-    });
+      });
   };
 
-  return () => iframeWallet({
-    request: (method, params) => request({ method, params }),
-  });
-}
+  return () =>
+    iframeWallet({
+      request: (method, params) => request({ method, params }),
+    });
+};
 
 interface IFrameWalletConfig {
   request: providers.JsonRpcFetchFunc;
 }
 
-function iframeWallet(options?: IFrameWalletConfig): WalletConfig<IFrameWallet> {
+function iframeWallet(
+  options?: IFrameWalletConfig
+): WalletConfig<IFrameWallet> {
   const id = "iframe-wallet";
 
   return {
@@ -63,11 +73,12 @@ function iframeWallet(options?: IFrameWalletConfig): WalletConfig<IFrameWallet> 
     meta: {
       name: "IFrame Wallet",
       // @TODO: This URL is for demo purpose only. DON'T use in production.
-      iconURL: "https://cdn0.iconfinder.com/data/icons/finance-development/512/CEO-22-512.png",
+      iconURL:
+        "https://cdn0.iconfinder.com/data/icons/finance-development/512/CEO-22-512.png",
     },
 
     create(walletOptions) {
-      return new IFrameWallet(id, { ...walletOptions, ...options, } as any)
+      return new IFrameWallet(id, { ...walletOptions, ...options } as any);
     },
 
     isInstalled() {
@@ -91,7 +102,10 @@ class IFrameWallet extends AbstractClientWallet<IFrameWalletOptions> {
   }
 }
 
-function createConnector(request: providers.JsonRpcFetchFunc, connectorStorage: AsyncStorage): Connector {
+function createConnector(
+  request: providers.JsonRpcFetchFunc,
+  connectorStorage: AsyncStorage
+): Connector {
   const connector = new InjectedConnector({
     connectorStorage,
     options: {
@@ -104,8 +118,10 @@ function createConnector(request: providers.JsonRpcFetchFunc, connectorStorage: 
           },
         } as any; // HACK: Overwrite TypeScript's type checking
       },
-    }
+    },
   });
   const adapter = new WagmiAdapter(connector);
   return adapter;
 }
+
+export { useThirdwebIFrameWalletConfig };

@@ -1,3 +1,4 @@
 export * from "./useViolet";
-export { useThirdwebIFrameWalletConfig } from "./useThirdwebIFrameWalletConfig";
-export { useWeb3ReactIFrameExecutor } from "./useWeb3ReactIFrameExecutor";
+export * from "./useThirdwebIFrameWalletConfig";
+export * from "./useWeb3ReactIFrameExecutor";
+export * from "./useIsEmbedded";
