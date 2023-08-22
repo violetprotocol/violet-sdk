@@ -2,7 +2,7 @@
 
 import { useWeb3React } from "@web3-react/core";
 import { RefObject, useEffect, useRef } from "react";
-import { useIFrameTransport } from "./useIFrameTransport";
+import { useIFrameTransport } from "@violetprotocol/sdk";
 
 interface UseIFrameExecutorProps {
   sourceRef: RefObject<any>;
@@ -15,7 +15,7 @@ interface UseIFrameExecutorProps {
  * @param sourceRef - the parent `window` to which the child posts messages as requests
  * @param targetRef - the child `window` (iframe) to which the parent posts messages as replies
  */
-export function useWeb3ReactIFrameExecutor({
+function useIFrameExecutor({
   sourceRef,
   targetRef,
 }: UseIFrameExecutorProps) {
@@ -37,3 +37,5 @@ export function useWeb3ReactIFrameExecutor({
     targetRef,
   });
 }
+
+export { useIFrameExecutor };
