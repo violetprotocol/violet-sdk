@@ -8,10 +8,9 @@ import {
 import { InjectedConnector } from "@thirdweb-dev/wallets/evm/connectors/injected";
 import { WalletConfig } from "@thirdweb-dev/react";
 import { useEffect, useRef } from "react";
-import { IFrameMessageKind, getUniqueId } from "../utils/iframeTransport";
-import { useIFrameTransport } from "./useIFrameTransport";
+import { useIFrameTransport, IFrameMessageKind, getUniqueId } from "@violetprotocol/sdk";
 
-const useThirdwebIFrameWalletConfig = () => {
+const useIFrameWalletConfig = () => {
   const sourceRef = useRef<any>();
   const targetRef = useRef<any>();
 
@@ -124,4 +123,4 @@ function createConnector(
   return adapter;
 }
 
-export { useThirdwebIFrameWalletConfig };
+export { useIFrameWalletConfig };

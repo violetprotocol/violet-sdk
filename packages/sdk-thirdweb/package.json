@@ -1,6 +1,6 @@
 {
-  "name": "@violetprotocol/sdk",
-  "version": "0.0.10",
+  "name": "@violetprotocol/sdk-thirdweb",
+  "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,7 +28,10 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@ethersproject/bytes": "^5.7.0",
+    "@violetprotocol/sdk": "workspace:*",
+    "ethers": "5.7.2",
+    "@thirdweb-dev/wallets": "^1.1.11",
+    "@thirdweb-dev/react": "^3.14.28",
     "@web3-react/core": "^8.2.0"
   }
 }
