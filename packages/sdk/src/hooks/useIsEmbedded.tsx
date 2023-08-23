@@ -45,13 +45,13 @@ const useIsEmbedded = () => {
     };
   }, []);
 
-  // add more deterministic rules later on
+  // TODO add more deterministic rules later on
 
-  if (!size.height) {
+  if (!size.height || !size.width) {
     return false;
   }
 
-  if (size.height <= 220) {
+  if (size.height <= 384 && size.width <= 224) {
     return true;
   }
 
