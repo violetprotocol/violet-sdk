@@ -19,7 +19,7 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.20",
+    "@types/react": "^18.2.21",
     "eslint": "^8.47.0",
     "eslint-config-custom": "workspace:*",
     "react": "^18.2.0",
@@ -28,10 +28,10 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@thirdweb-dev/react": "^3.14.35",
+    "@thirdweb-dev/wallets": "^1.1.18",
     "@violetprotocol/sdk": "workspace:*",
-    "ethers": "5.7.2",
-    "@thirdweb-dev/wallets": "^1.1.11",
-    "@thirdweb-dev/react": "^3.14.28",
-    "@web3-react/core": "^8.2.0"
+    "@web3-react/core": "^8.2.2",
+    "ethers": "5.7.2"
   }
 }

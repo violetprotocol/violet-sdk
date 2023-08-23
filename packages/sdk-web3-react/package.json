@@ -19,7 +19,7 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.20",
+    "@types/react": "^18.2.21",
     "eslint": "^8.47.0",
     "eslint-config-custom": "workspace:*",
     "react": "^18.2.0",
@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "@violetprotocol/sdk": "workspace:*",
-    "@web3-react/core": "^8.2.0"
+    "@web3-react/core": "^8.2.2"
   }
 }
