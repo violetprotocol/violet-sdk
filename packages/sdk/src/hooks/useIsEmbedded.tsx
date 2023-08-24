@@ -51,7 +51,7 @@ const useIsEmbedded = () => {
     return false;
   }
 
-  if (size.height <= 384 && size.width <= 224) {
+  if (size.height <= 224 && size.width <= 384) {
     return true;
   }
 
