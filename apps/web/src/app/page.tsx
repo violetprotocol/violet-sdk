@@ -51,6 +51,7 @@ const Page = () => {
 
   const [token, setToken] = useState<string>();
   const [error, setError] = useState(false);
+  const [pending, setPending] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
 
   const [apiUrl, setApiUrl] = useState<string>(LOCAL_API_URL);
@@ -96,7 +97,7 @@ const Page = () => {
 
     if (!response) return;
 
-    const [eat, error] = response;
+    const [success, error, pending] = response;
 
     if (error) {
       console.error(error);
@@ -104,8 +105,14 @@ const Page = () => {
       setError(true);
     }
 
-    if (eat) {
-      setToken(eat.rawEAT);
+    if (pending) {
+      console.warn(pending);
+
+      setPending(true);
+    }
+
+    if (success) {
+      setToken(success.rawEAT);
     }
   };
 
@@ -147,10 +154,18 @@ const Page = () => {
 
     const error = searchParams.get("error_code");
 
+    const pending = searchParams.get("pending_state");
+
     if (error) {
       console.error(error);
 
       setError(true);
+    }
+
+    if (pending) {
+      console.warn(pending);
+
+      setPending(true);
     }
 
     if (token) {
@@ -201,7 +216,7 @@ const Page = () => {
         </div>
       ) : null}
 
-      {isConnected && !token && error ? (
+      {isConnected && !token && error && !pending ? (
         <div id="ERROR" className="h-36 w-36">
           <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle
@@ -216,7 +231,22 @@ const Page = () => {
         </div>
       ) : null}
 
-      {isConnected && !token && !error ? (
+      {isConnected && !token && !error && pending ? (
+        <div id="ERROR" className="h-36 w-36">
+          <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
+            <circle
+              cx="44"
+              cy="44"
+              r="46"
+              fill={ERROR_COLOR}
+              stroke={ERROR_COLOR}
+              strokeWidth="4"
+            />
+          </svg>
+        </div>
+      ) : null}
+
+      {isConnected && !token && !error && !pending ? (
         <div
           id="CONNECTED_NOT_AUTHORIZED"
           className="h-36 w-36 cursor-pointer"
@@ -243,7 +273,7 @@ const Page = () => {
         </div>
       ) : null}
 
-      {isConnected && token && !error ? (
+      {isConnected && token && !error && !pending ? (
         <div id="CONNECTED_AND_AUTHORIZED" className="h-36 w-36">
           <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle

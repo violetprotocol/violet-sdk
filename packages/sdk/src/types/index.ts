@@ -36,6 +36,10 @@ type AuthorizeVioletResponse =
   | {
       error_code: string;
       tx_id: string;
+    }
+  | {
+      pending_state: string;
+      tx_id: string;
     };
 
 type EAT = {
@@ -43,9 +47,16 @@ type EAT = {
   expiry: number;
 };
 
+type SuccessResponse = { rawEAT: string; txId: string; eat: EAT };
+
+type ErrorResponse = { code: string; txId?: string };
+
+type PendingResponse = { code: string; txId?: string };
+
 type AuthorizeResponse = [
-  { rawEAT: string; txId: string; eat: EAT } | null,
-  { code: string; txId?: string } | null
+  SuccessResponse | null,
+  ErrorResponse | null,
+  PendingResponse | null,
 ];
 
 type AuthorizePartialProps = Omit<

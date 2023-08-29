@@ -31,7 +31,7 @@ const DEFAULT_OPTIONS: RedirectOptions | PopupOptions = {
  * @param {string} options.clientId - The client ID for the application.
  * @param {string} options.redirectUrl - The URL to redirect to after authorization and associated with the client ID. * @param {string} [options.apiUrl=API_URL] - The URL of the API for authorization. Defaults to API_URL.
  * @param {Object} [options.options=DEFAULT_OPTIONS] - The options for the authorization request. Defaults to DEFAULT_OPTIONS.
- * @returns {Promise<AuthorizeResponse|void>} - A promise that resolves to an array with two elements. The first element is an object with `token` and `txId` if authorization was successful or `null` if not. The second element is an object with `code` and `txId` if there was an error or `null` if not. If the function is run outside of a browser environment, the function returns `undefined`.
+ * @returns {Promise<AuthorizeResponse|void>} - A promise that resolves to an array with three elements. The first element is an object with `token` and `txId` if authorization was successful or `null` if not. The second element is an object with `code` and `txId` if there was an error or `null` if not. The third is an object with the pending state, that contains `code` and `txId`, that happens when we are still processing the documents. If the function is run outside of a browser environment, the function returns `undefined`.
  * @throws - If an unknown error occurs.
  */
 const authorize = async ({
@@ -82,7 +82,7 @@ const authorize = async ({
         popup.close();
 
         if (!event.isTrusted) {
-          return resolve([null, { code: "EVENT_NOT_TRUSTED" }]);
+          return resolve([null, { code: "EVENT_NOT_TRUSTED" }, null]);
         }
 
         if ("error_code" in event.data) {
@@ -90,6 +90,18 @@ const authorize = async ({
             null,
             {
               code: event.data.error_code.toUpperCase(),
+              txId: event.data.tx_id,
+            },
+            null,
+          ]);
+        }
+
+        if ("pending_state" in event.data) {
+          return resolve([
+            null,
+            null,
+            {
+              code: event.data.pending_state.toUpperCase(),
               txId: event.data.tx_id,
             },
           ]);
@@ -106,6 +118,7 @@ const authorize = async ({
                 code: "EAT_PARSING_FAILED",
                 txId: event.data.tx_id,
               },
+              null,
             ]);
           }
 
@@ -117,6 +130,7 @@ const authorize = async ({
               txId: event.data.tx_id,
               eat: { signature, expiry: parsedEAT.expiry },
             },
+            null,
             null,
           ]);
         }
