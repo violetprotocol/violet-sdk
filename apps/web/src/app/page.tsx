@@ -181,182 +181,190 @@ const Page = () => {
   if (!hasMounted) return null;
 
   return (
-    <main className="flex h-screen justify-center items-center">
-      {!isConnected ? (
-        <div
-          id="NOT_CONNECTED"
-          className="h-36 w-36 cursor-pointer"
-          onClick={handleConnect}
-        >
-          <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
-            <circle
-              cx="44"
-              cy="44"
-              r="46"
-              fill="none"
-              stroke={BRAND_COLOR}
-              strokeWidth="4"
-            />
-          </svg>
-        </div>
-      ) : null}
+    <>
+      <span className="absolute top-4 right-4">{address}</span>
 
-      {isConnected && !token && error ? (
-        <div id="ERROR" className="h-36 w-36">
-          <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
-            <circle
-              cx="44"
-              cy="44"
-              r="46"
-              fill={ERROR_COLOR}
-              stroke={ERROR_COLOR}
-              strokeWidth="4"
-            />
-          </svg>
-        </div>
-      ) : null}
+      <main className="flex h-screen justify-center items-center">
+        {!isConnected ? (
+          <div
+            id="NOT_CONNECTED"
+            className="h-36 w-36 cursor-pointer"
+            onClick={handleConnect}
+          >
+            <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
+              <circle
+                cx="44"
+                cy="44"
+                r="46"
+                fill="none"
+                stroke={BRAND_COLOR}
+                strokeWidth="4"
+              />
+            </svg>
+          </div>
+        ) : null}
 
-      {isConnected && !token && !error ? (
-        <div
-          id="CONNECTED_NOT_AUTHORIZED"
-          className="h-36 w-36 cursor-pointer"
-          onClick={handleAuthorize}
-        >
-          <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
-            <circle
-              cx="44"
-              cy="44"
-              r="46"
-              fill="none"
-              stroke={BRAND_COLOR}
-              strokeWidth="4"
-            />
+        {isConnected && !token && error ? (
+          <div id="ERROR" className="h-36 w-36">
+            <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
+              <circle
+                cx="44"
+                cy="44"
+                r="46"
+                fill={ERROR_COLOR}
+                stroke={ERROR_COLOR}
+                strokeWidth="4"
+              />
+            </svg>
+          </div>
+        ) : null}
 
-            <path
-              d="
+        {isConnected && !token && !error ? (
+          <div
+            id="CONNECTED_NOT_AUTHORIZED"
+            className="h-36 w-36 cursor-pointer"
+            onClick={handleAuthorize}
+          >
+            <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
+              <circle
+                cx="44"
+                cy="44"
+                r="46"
+                fill="none"
+                stroke={BRAND_COLOR}
+                strokeWidth="4"
+              />
+
+              <path
+                d="
                 M-4, 44
                 a1,1 0 0,0 96,0
               "
-              fill={BRAND_COLOR}
-            />
-          </svg>
-        </div>
-      ) : null}
-
-      {isConnected && token && !error ? (
-        <div id="CONNECTED_AND_AUTHORIZED" className="h-36 w-36">
-          <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
-            <circle
-              cx="44"
-              cy="44"
-              r="46"
-              fill={BRAND_COLOR}
-              stroke={BRAND_COLOR}
-              strokeWidth="4"
-            />
-          </svg>
-        </div>
-      ) : null}
-
-      <Dialog open={isFormOpen} onOpenChange={setFormOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="absolute bottom-4 right-4 rounded-full"
-          >
-            ?
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-6xl">
-          <DialogHeader>
-            <DialogTitle>Edit the parameters</DialogTitle>
-            <DialogDescription>
-              Make changes to the parameters here, so you can test it properly.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form
-            className="grid gap-4 py-4"
-            onSubmit={handleSubmit(handleParametersSubmit)}
-          >
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="apiUrl" className="text-right">
-                API URL
-              </Label>
-              <Input
-                id="apiUrl"
-                {...register("apiUrl", { required: true })}
-                className="col-span-3"
+                fill={BRAND_COLOR}
               />
-            </div>
+            </svg>
+          </div>
+        ) : null}
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="transactionData" className="text-right">
-                Transaction Data
-              </Label>
-              <Input
-                id="transactionData"
-                {...register("transactionData", { required: true })}
-                className="col-span-3"
+        {isConnected && token && !error ? (
+          <div id="CONNECTED_AND_AUTHORIZED" className="h-36 w-36">
+            <svg viewBox="-4 -4 96 96" xmlns="http://www.w3.org/2000/svg">
+              <circle
+                cx="44"
+                cy="44"
+                r="46"
+                fill={BRAND_COLOR}
+                stroke={BRAND_COLOR}
+                strokeWidth="4"
               />
-            </div>
+            </svg>
+          </div>
+        ) : null}
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label
-                htmlFor="transactionFunctionSignature"
-                className="text-right"
-              >
-                Transaction Function Signature
-              </Label>
-              <Input
-                id="transactionFunctionSignature"
-                {...register("transactionFunctionSignature", {
-                  required: true,
-                })}
-                className="col-span-3"
-              />
-            </div>
+        <Dialog open={isFormOpen} onOpenChange={setFormOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              className="absolute bottom-4 right-4 rounded-full"
+            >
+              ?
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-6xl">
+            <DialogHeader>
+              <DialogTitle>Edit the parameters</DialogTitle>
+              <DialogDescription>
+                Make changes to the parameters here, so you can test it
+                properly.
+              </DialogDescription>
+            </DialogHeader>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="transactionTargetContract" className="text-right">
-                Transaction Target Contract
-              </Label>
-              <Input
-                id="transactionTargetContract"
-                {...register("transactionTargetContract", { required: true })}
-                className="col-span-3"
-              />
-            </div>
+            <form
+              className="grid gap-4 py-4"
+              onSubmit={handleSubmit(handleParametersSubmit)}
+            >
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="apiUrl" className="text-right">
+                  API URL
+                </Label>
+                <Input
+                  id="apiUrl"
+                  {...register("apiUrl", { required: true })}
+                  className="col-span-3"
+                />
+              </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="redirectUrl" className="text-right">
-                Redirect URL
-              </Label>
-              <Input
-                id="redirectUrl"
-                {...register("redirectUrl", { required: true })}
-                className="col-span-3"
-              />
-            </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="transactionData" className="text-right">
+                  Transaction Data
+                </Label>
+                <Input
+                  id="transactionData"
+                  {...register("transactionData", { required: true })}
+                  className="col-span-3"
+                />
+              </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="clientId" className="text-right">
-                Client ID
-              </Label>
-              <Input
-                id="clientId"
-                {...register("clientId", { required: true })}
-                className="col-span-3"
-              />
-            </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label
+                  htmlFor="transactionFunctionSignature"
+                  className="text-right"
+                >
+                  Transaction Function Signature
+                </Label>
+                <Input
+                  id="transactionFunctionSignature"
+                  {...register("transactionFunctionSignature", {
+                    required: true,
+                  })}
+                  className="col-span-3"
+                />
+              </div>
 
-            <DialogFooter>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </main>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label
+                  htmlFor="transactionTargetContract"
+                  className="text-right"
+                >
+                  Transaction Target Contract
+                </Label>
+                <Input
+                  id="transactionTargetContract"
+                  {...register("transactionTargetContract", { required: true })}
+                  className="col-span-3"
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="redirectUrl" className="text-right">
+                  Redirect URL
+                </Label>
+                <Input
+                  id="redirectUrl"
+                  {...register("redirectUrl", { required: true })}
+                  className="col-span-3"
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="clientId" className="text-right">
+                  Client ID
+                </Label>
+                <Input
+                  id="clientId"
+                  {...register("clientId", { required: true })}
+                  className="col-span-3"
+                />
+              </div>
+
+              <DialogFooter>
+                <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </main>
+    </>
   );
 };
 
