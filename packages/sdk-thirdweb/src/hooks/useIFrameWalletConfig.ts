@@ -8,7 +8,7 @@ import {
 import { InjectedConnector } from "@thirdweb-dev/wallets/evm/connectors/injected";
 import { WalletConfig } from "@thirdweb-dev/react";
 import { useEffect, useRef } from "react";
-import { useIFrameTransport, IFrameMessageKind, getUniqueId } from "@violetprotocol/sdk";
+import { useIFrameTransport, IFrameMessageKind } from "@violetprotocol/sdk";
 
 const useIFrameWalletConfig = () => {
   const sourceRef = useRef<any>();
@@ -28,28 +28,34 @@ const useIFrameWalletConfig = () => {
     targetRef,
   });
 
-  const request = (data: RequestProps): Promise<any> => {
-    return transportRef!
-      .current!.executeRequest({
-        id: getUniqueId(),
+  const request = async (data: RequestProps) => {
+    try {
+      const executedRequest = await transportRef.current!.executeRequest({
+        id: crypto.randomUUID(),
         kind: IFrameMessageKind.Request,
         data,
-      })
-      .then((data) => {
-        if (data.success) {
-          data = data.data;
-          console.log(`[CHILD WALLET RESPONSE] Success: `, data);
-          return data;
-        } else if (data.failure) {
-          const error = data.error;
-          console.log(`[CHILD WALLET RESPONSE] Failure: `, error);
-          throw error;
-        }
-      })
-      .catch((error) => {
-        console.log(`[CHILD WALLET RESPONSE] Failure: `, error);
-        throw error;
       });
+
+      if (executedRequest.failure) {
+        const { error } = executedRequest;
+
+        console.log(`[CHILD WALLET RESPONSE] Failure: `, error);
+
+        throw error;
+      }
+
+      if (executedRequest.success) {
+        const response = executedRequest.data;
+
+        console.log(`[CHILD WALLET RESPONSE] Success: `, data);
+
+        return response;
+      }
+    } catch (error) {
+      console.log(`[CHILD WALLET RESPONSE] Failure: `, error);
+
+      throw error;
+    }
   };
 
   return () =>

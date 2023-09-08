@@ -1,53 +1,44 @@
-export enum IFrameMessageKind {
+enum IFrameMessageKind {
   Request = "iframe-message-request",
   Response = "iframe-message-response",
 }
 
-export type IFrameMessage<ReqData = any, ResData = any> =
+type IFrameMessage<ReqData = unknown, ResData = unknown> =
   | IFrameMessageRequest<ReqData>
   | IFrameMessageResponse<ResData>;
 
-export type IFrameMessageId = string;
+type IFrameMessageId = string;
 
-export interface IFrameMessageRequest<Data = any> {
+type IFrameMessageRequest<Data = unknown> = {
   id: IFrameMessageId;
-  kind: IFrameMessageKind.Request,
+  kind: IFrameMessageKind.Request;
   data: Data;
-}
+};
 
-export type IFrameMessageResponse<Data = any> = IFrameMessageResponseSuccess<Data> | IFrameMessageResponseFailure;
+type IFrameMessageResponse<Data = unknown> =
+  | IFrameMessageResponseSuccess<Data>
+  | IFrameMessageResponseFailure;
 
-export interface IFrameMessageResponseSuccess<Data = any> {
+type IFrameMessageResponseSuccess<Data = unknown> = {
   id: IFrameMessageId;
-  kind: IFrameMessageKind.Response,
-  success: true,
-  failure: false,
+  kind: IFrameMessageKind.Response;
+  success: true;
+  failure: false;
   data: Data;
-}
+};
 
-export interface IFrameMessageResponseFailure {
+type IFrameMessageResponseFailure = {
   id: IFrameMessageId;
-  kind: IFrameMessageKind.Response,
-  success: false,
-  failure: true,
+  kind: IFrameMessageKind.Response;
+  success: false;
+  failure: true;
   error: unknown;
-}
+};
 
-/**
- * We return a random number between the 0 and the maximum safe integer so that we always generate a unique identifier,
- * across all communication channels.
- */
-export function getUniqueId(): string {
-  return Math.floor(Math.random() * Number.MAX_VALUE).toString();
-}
-
-// By default post to any origin
-const DEFAULT_TARGET_ORIGIN = '*';
-// By default timeout is 60 seconds
+const DEFAULT_TARGET_ORIGIN = "*";
 const DEFAULT_TIMEOUT_MILLISECONDS = 240000;
 
-// The interface for the source of the events, typically the window.
-export interface MinimalEventSourceInterface {
+type MinimalEventSourceType = {
   addEventListener(
     eventType: "message",
     handler: (message: MessageEvent) => void
@@ -56,63 +47,56 @@ export interface MinimalEventSourceInterface {
     eventType: "message",
     handler: (message: MessageEvent) => void
   ): void;
-}
+};
 
-// The interface for the target of our events, typically the parent window.
-export interface MinimalEventTargetInterface {
-  postMessage(message: any, targetOrigin?: string): void;
-}
+type MinimalEventTargetType = {
+  postMessage(message: unknown, targetOrigin?: string): void;
+};
 
-/**
- * Options for constructing the iframe transport.
- */
-export interface IFrameTransportOptions {
-  // The origin to communicate with. Default '*'
+type IFrameTransportOptions = {
   targetOrigin?: string;
-  // How long to time out waiting for responses. Default 60 seconds.
   timeoutMilliseconds?: number;
+  eventSource?: MinimalEventSourceType;
+  eventTarget?: MinimalEventTargetType;
+};
 
-  // The event source. By default we use the window. This can be mocked for tests, or it can wrap
-  // a different interface, e.g. workers.
-  eventSource?: MinimalEventSourceInterface;
-
-  // The event target. By default we use the window parent. This can be mocked for tests, or it can wrap
-  // a different interface, e.g. workers.
-  eventTarget?: MinimalEventTargetInterface;
-}
-
-/**
- * This is what we store in the state to keep track of pending promises.
- */
-interface PromiseCompleter<Data> {
-  // A response was received (either error or result response).
+type PromiseCompleter<Data> = {
   resolve(result: IFrameMessageResponseSuccess<Data>): void;
-
-  // An error with executing the request was encountered.
   reject(error: unknown): void;
-}
+};
 
 /**
- * This is the primary artifact of this library.
+ * This class represents an InteframeTransport, which is a mechanism for communication between iFrames
+ *
+ * @property {string} targetOrigin - The origin to communicate with. Default '*'
+ * @property {number} timeoutMilliseconds - How long to time out waiting for responses. Default 240000 milliseconds.
+ * @property {MinimalEventSourceType} eventSource - The type for the source of events, typically the window.
+ * @property {MinimalEventTargetType} eventTarget - The type for the target of our events, typically the parent window.
+ * @property {(data: unknown) => Promise<unknown>} requestExecutor - The request executor function
+ * @property {{[id: string]: PromiseCompleter<unknown>; }} completers - Object to store pending promises
+ *
+ * @constructor
+ * @param {function} requestExecutor - Main function to handle requests processing
+ * @param {IFrameTransportOptions} IFrameTransportOptions - object for passing options
  */
-export class IFrameTransport {
+class IFrameTransport {
   private readonly targetOrigin: string;
   private readonly timeoutMilliseconds: number;
-  private readonly eventSource: MinimalEventSourceInterface;
-  private readonly eventTarget: MinimalEventTargetInterface;
+  private readonly eventSource: MinimalEventSourceType;
+  private readonly eventTarget: MinimalEventTargetType;
   private readonly completers: {
     [id: string]: PromiseCompleter<any>;
   } = {};
-  private readonly requestExecutor: (data: any) => Promise<any>;
+  private readonly requestExecutor: (data: unknown) => Promise<unknown>;
 
   public constructor(
-    requestExecutor: (data: any) => Promise<any>,
+    requestExecutor: (data: unknown) => Promise<unknown>,
     {
       targetOrigin = DEFAULT_TARGET_ORIGIN,
       timeoutMilliseconds = DEFAULT_TIMEOUT_MILLISECONDS,
       eventSource = window,
       eventTarget = window.parent,
-    }: IFrameTransportOptions = {},
+    }: IFrameTransportOptions = {}
   ) {
     this.targetOrigin = targetOrigin;
     this.timeoutMilliseconds = timeoutMilliseconds;
@@ -120,32 +104,27 @@ export class IFrameTransport {
     this.eventTarget = eventTarget;
     this.requestExecutor = requestExecutor;
 
-    // Listen for messages from the event source.
     this.eventSource.addEventListener("message", this.handleEventSourceMessage);
   }
 
   public cleanup() {
-    this.eventSource.removeEventListener("message", this.handleEventSourceMessage);
+    this.eventSource.removeEventListener(
+      "message",
+      this.handleEventSourceMessage
+    );
   }
 
-  /**
-   * Helper method that handles transport and request wrapping
-   * @param method method to execute
-   * @param params params to pass the method
-   * @param requestId jsonrpc request id
-   */
-  public async executeRequest<ReqData = any, ResData = any>(
+  public async executeRequest<ReqData = unknown, ResData = unknown>(
     request: IFrameMessageRequest<ReqData>
   ): Promise<IFrameMessageResponse<ResData>> {
     const { id } = request;
 
-    const promise = new Promise<
-      IFrameMessageResponse<ResData>
-    >((resolve, reject) => (this.completers[id] = { resolve, reject }));
+    const promise = new Promise<IFrameMessageResponse<ResData>>(
+      (resolve, reject) => (this.completers[id] = { resolve, reject })
+    );
 
     this.eventTarget.postMessage(request, this.targetOrigin);
 
-    // Delete the completer within the timeout and reject the promise.
     setTimeout(() => {
       if (this.completers[id]) {
         this.completers[id].reject(
@@ -153,17 +132,14 @@ export class IFrameTransport {
             `IFrameTransport Request with ID "${id}" timed out after ${this.timeoutMilliseconds} milliseconds`
           )
         );
+
         delete this.completers[id];
       }
     }, this.timeoutMilliseconds);
 
     return promise;
-  };
+  }
 
-  /**
-   * Handle a message on the event source.
-   * @param event message event that will be processed by the provider
-   */
   private handleEventSourceMessage = (event: MessageEvent) => {
     const data = event.data;
     if (!data) return;
@@ -196,8 +172,7 @@ export class IFrameTransport {
         });
     } else if (message.kind === IFrameMessageKind.Response) {
       const completer = this.completers[message.id];
-  
-      // True if we haven't timed out and this is a response to a message we sent.
+
       if (completer) {
         if (message.success) {
           completer.resolve(message);
@@ -205,7 +180,7 @@ export class IFrameTransport {
           completer.reject(message);
         } else {
           completer.reject(
-            new Error('Response from provider did not have error or result key')
+            new Error("Response from provider did not have error or result key")
           );
         }
         delete this.completers[message.id];
@@ -215,3 +190,21 @@ export class IFrameTransport {
     }
   };
 }
+
+export type {
+  IFrameMessage,
+  IFrameMessageRequest,
+  IFrameMessageResponse,
+  PromiseCompleter,
+  IFrameTransportOptions,
+  MinimalEventTargetType,
+  MinimalEventSourceType,
+  IFrameMessageId,
+};
+
+export {
+  IFrameMessageKind,
+  IFrameTransport,
+  DEFAULT_TARGET_ORIGIN,
+  DEFAULT_TIMEOUT_MILLISECONDS,
+};

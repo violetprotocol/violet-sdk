@@ -1,6 +1,6 @@
 // "use client"
 
-import { useWeb3React } from "@web3-react/core";
+import { Web3ContextType, useWeb3React } from "@web3-react/core";
 import { RefObject, useEffect, useRef } from "react";
 import { useIFrameTransport } from "@violetprotocol/sdk";
 
@@ -15,27 +15,36 @@ interface UseIFrameExecutorProps {
  * @param sourceRef - the parent `window` to which the child posts messages as requests
  * @param targetRef - the child `window` (iframe) to which the parent posts messages as replies
  */
-function useIFrameExecutor({
+const useIFrameExecutor = ({
   sourceRef,
   targetRef,
-}: UseIFrameExecutorProps) {
-  const ref_ = useRef<any>();
+}: UseIFrameExecutorProps) => {
+  const ref = useRef<Web3ContextType["connector"] | null>(null);
   const w3 = useWeb3React();
 
   useEffect(() => {
-    ref_.current = w3.connector;
+    ref.current = w3.connector;
   }, [sourceRef?.current, targetRef?.current]);
 
   useIFrameTransport({
     async requestExecutor(request) {
       console.log(`[PARENT REQUEST EXECUTOR]: `, request);
-      const connector = ref_.current;
-      const provider = connector.customProvider || w3.connector.provider;
+
+      if (!ref.current) throw new Error("No connector found");
+
+      const connector = ref.current;
+
+      const provider =
+        (connector.customProvider as typeof w3.connector.provider) ||
+        w3.connector.provider;
+
+      if (!provider) throw new Error("No provider found");
+
       return provider.request(request);
     },
     sourceRef,
     targetRef,
   });
-}
+};
 
 export { useIFrameExecutor };

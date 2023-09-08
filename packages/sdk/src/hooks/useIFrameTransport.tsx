@@ -1,12 +1,16 @@
-// "use client";
+"use client";
 
 import { RefObject, useEffect, useRef } from "react";
-import { IFrameTransport } from "../utils/iframeTransport";
+import {
+  IFrameTransport,
+  MinimalEventSourceType,
+  MinimalEventTargetType,
+} from "../utils/iframeTransport";
 
 type UseIFrameTransportProps = {
-  requestExecutor: (request: any) => Promise<any>;
-  sourceRef: RefObject<any>;
-  targetRef: RefObject<any>;
+  requestExecutor: (request: unknown) => Promise<unknown>;
+  sourceRef: RefObject<MinimalEventSourceType>;
+  targetRef: RefObject<MinimalEventTargetType>;
 };
 
 const useIFrameTransport = ({

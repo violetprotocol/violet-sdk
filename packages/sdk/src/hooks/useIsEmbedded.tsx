@@ -1,6 +1,11 @@
-// "use client";
+"use client";
 
 import { useState, useLayoutEffect } from "react";
+import { checkWindowInIframe } from "../utils/isWindowInIframe";
+
+const MAX_WIDTH = 384;
+
+const MAX_HEIGHT = 416;
 
 /**
  * @returns {boolean} true if the page is embedded, false otherwise
@@ -30,6 +35,8 @@ const useIsEmbedded = () => {
     height: null,
   });
 
+  const isInIframe = checkWindowInIframe(window);
+
   useLayoutEffect(() => {
     const handleResize = () => {
       setSize({
@@ -37,7 +44,9 @@ const useIsEmbedded = () => {
         height: window.innerHeight,
       });
     };
+
     handleResize();
+
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -45,17 +54,17 @@ const useIsEmbedded = () => {
     };
   }, []);
 
-  // TODO add more deterministic rules later on
+  if (!isInIframe) return false;
 
-  if (!size.height || !size.width) {
+  if (!size.width || !size.height) {
     return false;
   }
 
-  if (size.height <= 224 && size.width <= 384) {
+  if (size.width <= MAX_WIDTH && size.height <= MAX_HEIGHT) {
     return true;
   }
 
   return false;
 };
 
-export { useIsEmbedded };
+export { useIsEmbedded, MAX_WIDTH, MAX_HEIGHT };

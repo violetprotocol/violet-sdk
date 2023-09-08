@@ -1,6 +1,6 @@
 "use client";
 
-import { useViolet } from "@violetprotocol/sdk";
+import { useViolet, buildAuthorizationUrl } from "@violetprotocol/sdk";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAccount, useConnect, useNetwork } from "wagmi";
@@ -27,6 +27,7 @@ import {
 } from "../components/Dialog";
 import { Input } from "../components/Input";
 import { Label } from "../components/Label";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 const BRAND_COLOR = "#9a4cff";
 const ERROR_COLOR = "#dc2626";
@@ -62,6 +63,7 @@ const Page = () => {
   const [redirectUrl, setRedirectUrl] = useState<string>(REDIRECT_URL);
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
   const [network, setNetwork] = useState<number>(CHAIN_ID.OPTIMISM_GOERLI);
+  const [, copyToClipboard] = useCopyToClipboard();
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
@@ -77,21 +79,23 @@ const Page = () => {
   const [isFormOpen, setFormOpen] = useState(false);
 
   const { authorize } = useViolet({
-    redirectUrl: redirectUrl,
-    clientId: clientId,
-    apiUrl: apiUrl,
+    redirectUrl,
+    clientId,
+    apiUrl,
   });
+
+  const transaction = {
+    data: transactionData,
+    functionSignature: transactionFunctionSignature,
+    targetContract: transactionTargetContract,
+  };
 
   // POPUP
   const handleAuthorize = async () => {
     const response = await authorize({
-      transaction: {
-        data: transactionData,
-        functionSignature: transactionFunctionSignature,
-        targetContract: transactionTargetContract,
-      },
+      transaction,
       chainId: chain.id,
-      address: address,
+      address,
     });
 
     if (!response) return;
@@ -363,6 +367,27 @@ const Page = () => {
             </form>
           </DialogContent>
         </Dialog>
+
+        {isConnected ? (
+          <Button
+            variant="outline"
+            className="absolute bottom-4 left-4 rounded-full"
+            onClick={() =>
+              copyToClipboard(
+                buildAuthorizationUrl({
+                  transaction,
+                  address,
+                  chainId: chain.id,
+                  clientId,
+                  redirectUrl,
+                  apiUrl,
+                })
+              )
+            }
+          >
+            Copy Link
+          </Button>
+        ) : null}
       </main>
     </>
   );
