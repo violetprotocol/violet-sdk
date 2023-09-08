@@ -8,8 +8,6 @@ const checkWindowInIframe = (window: Window) => {
 
   if (window.self === window.top) return false;
 
-  if (!window.frameElement) return false;
-
   return true;
 };
 

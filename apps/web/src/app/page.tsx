@@ -41,6 +41,9 @@ type FormValues = {
   clientId: string;
 };
 
+const IFRAME_WIDTH = 384;
+const IFRAME_HEIGHT = 416;
+
 const Page = () => {
   const { isConnected, address } = useAccount();
   const { chain } = useNetwork();
@@ -76,8 +79,6 @@ const Page = () => {
     },
   });
 
-  const [isFormOpen, setFormOpen] = useState(false);
-
   const { authorize } = useViolet({
     redirectUrl,
     clientId,
@@ -89,6 +90,8 @@ const Page = () => {
     functionSignature: transactionFunctionSignature,
     targetContract: transactionTargetContract,
   };
+
+  const handleIframe = () => {};
 
   // POPUP
   const handleAuthorize = async () => {
@@ -129,8 +132,6 @@ const Page = () => {
     setRedirectUrl(data.redirectUrl);
 
     setClientId(data.clientId);
-
-    setFormOpen(false);
   };
 
   useEffect(() => {
@@ -265,129 +266,154 @@ const Page = () => {
           </div>
         ) : null}
 
-        <Dialog open={isFormOpen} onOpenChange={setFormOpen}>
-          <DialogTrigger asChild>
+        <div className="absolute bottom-4 right-4 flex gap-4">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="rounded-full">
+                ?
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-6xl">
+              <DialogHeader>
+                <DialogTitle>Edit the parameters</DialogTitle>
+                <DialogDescription>
+                  Make changes to the parameters here, so you can test it
+                  properly.
+                </DialogDescription>
+              </DialogHeader>
+
+              <form
+                className="grid gap-4 py-4"
+                onSubmit={handleSubmit(handleParametersSubmit)}
+              >
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="apiUrl" className="text-right">
+                    API URL
+                  </Label>
+                  <Input
+                    id="apiUrl"
+                    {...register("apiUrl", { required: true })}
+                    className="col-span-3"
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="transactionData" className="text-right">
+                    Transaction Data
+                  </Label>
+                  <Input
+                    id="transactionData"
+                    {...register("transactionData", { required: true })}
+                    className="col-span-3"
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor="transactionFunctionSignature"
+                    className="text-right"
+                  >
+                    Transaction Function Signature
+                  </Label>
+                  <Input
+                    id="transactionFunctionSignature"
+                    {...register("transactionFunctionSignature", {
+                      required: true,
+                    })}
+                    className="col-span-3"
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor="transactionTargetContract"
+                    className="text-right"
+                  >
+                    Transaction Target Contract
+                  </Label>
+                  <Input
+                    id="transactionTargetContract"
+                    {...register("transactionTargetContract", {
+                      required: true,
+                    })}
+                    className="col-span-3"
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="redirectUrl" className="text-right">
+                    Redirect URL
+                  </Label>
+                  <Input
+                    id="redirectUrl"
+                    {...register("redirectUrl", { required: true })}
+                    className="col-span-3"
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="clientId" className="text-right">
+                    Client ID
+                  </Label>
+                  <Input
+                    id="clientId"
+                    {...register("clientId", { required: true })}
+                    className="col-span-3"
+                  />
+                </div>
+
+                <DialogFooter>
+                  <Button type="submit">Save changes</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          {isConnected ? (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="rounded-full">
+                  Open Iframe
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[432px] h-[464px] bg-neutral-50">
+                <iframe
+                  src={buildAuthorizationUrl({
+                    transaction,
+                    address,
+                    chainId: chain.id,
+                    clientId,
+                    redirectUrl,
+                    apiUrl,
+                  })}
+                  width={IFRAME_WIDTH}
+                  height={IFRAME_HEIGHT}
+                />
+              </DialogContent>
+            </Dialog>
+          ) : null}
+
+          {isConnected ? (
             <Button
               variant="outline"
-              className="absolute bottom-4 right-4 rounded-full"
+              className="rounded-full"
+              onClick={() =>
+                copyToClipboard(
+                  buildAuthorizationUrl({
+                    transaction,
+                    address,
+                    chainId: chain.id,
+                    clientId,
+                    redirectUrl,
+                    apiUrl,
+                  })
+                )
+              }
             >
-              ?
+              Copy Link
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-6xl">
-            <DialogHeader>
-              <DialogTitle>Edit the parameters</DialogTitle>
-              <DialogDescription>
-                Make changes to the parameters here, so you can test it
-                properly.
-              </DialogDescription>
-            </DialogHeader>
-
-            <form
-              className="grid gap-4 py-4"
-              onSubmit={handleSubmit(handleParametersSubmit)}
-            >
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="apiUrl" className="text-right">
-                  API URL
-                </Label>
-                <Input
-                  id="apiUrl"
-                  {...register("apiUrl", { required: true })}
-                  className="col-span-3"
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="transactionData" className="text-right">
-                  Transaction Data
-                </Label>
-                <Input
-                  id="transactionData"
-                  {...register("transactionData", { required: true })}
-                  className="col-span-3"
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label
-                  htmlFor="transactionFunctionSignature"
-                  className="text-right"
-                >
-                  Transaction Function Signature
-                </Label>
-                <Input
-                  id="transactionFunctionSignature"
-                  {...register("transactionFunctionSignature", {
-                    required: true,
-                  })}
-                  className="col-span-3"
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label
-                  htmlFor="transactionTargetContract"
-                  className="text-right"
-                >
-                  Transaction Target Contract
-                </Label>
-                <Input
-                  id="transactionTargetContract"
-                  {...register("transactionTargetContract", { required: true })}
-                  className="col-span-3"
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="redirectUrl" className="text-right">
-                  Redirect URL
-                </Label>
-                <Input
-                  id="redirectUrl"
-                  {...register("redirectUrl", { required: true })}
-                  className="col-span-3"
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="clientId" className="text-right">
-                  Client ID
-                </Label>
-                <Input
-                  id="clientId"
-                  {...register("clientId", { required: true })}
-                  className="col-span-3"
-                />
-              </div>
-
-              <DialogFooter>
-                <Button type="submit">Save changes</Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-
-        {isConnected ? (
-          <Button
-            variant="outline"
-            className="absolute bottom-4 left-4 rounded-full"
-            onClick={() =>
-              copyToClipboard(
-                buildAuthorizationUrl({
-                  transaction,
-                  address,
-                  chainId: chain.id,
-                  clientId,
-                  redirectUrl,
-                  apiUrl,
-                })
-              )
-            }
-          >
-            Copy Link
-          </Button>
-        ) : null}
+          ) : null}
+        </div>
       </main>
     </>
   );
