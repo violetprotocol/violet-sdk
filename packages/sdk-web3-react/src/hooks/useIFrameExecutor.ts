@@ -40,7 +40,12 @@ const useIFrameExecutor = ({
 
       if (!provider) throw new Error("No provider found");
 
-      return provider.request(request);
+      // check if request is RequestArguments
+      if (typeof request === "string") {
+        return provider.request({ method: request });
+      }
+
+      throw new Error("Invalid request");
     },
     sourceRef,
     targetRef,
