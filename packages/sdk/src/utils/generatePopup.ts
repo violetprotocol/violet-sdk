@@ -5,6 +5,9 @@ type PopupOptions = {
   focus?: boolean;
 };
 
+const WIDTH = 960;
+const HEIGHT = 800;
+
 const popupFeatures = `
   toolbar=no,
   location=no,
@@ -14,8 +17,8 @@ const popupFeatures = `
   scrollbars=no,
   resizable=no,
   copyhistory=no,
-  width=960,
-  height=800
+  width=${WIDTH}},
+  height=${HEIGHT}
 `;
 
 const generatePopup = ({

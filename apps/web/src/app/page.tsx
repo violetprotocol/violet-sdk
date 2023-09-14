@@ -55,7 +55,6 @@ const Page = () => {
 
   const [token, setToken] = useState<string>();
   const [error, setError] = useState(false);
-  const [hasMounted, setHasMounted] = useState(false);
 
   const [apiUrl, setApiUrl] = useState<string>(LOCAL_API_URL);
   const [transactionData, setTransactionData] = useState<string>(TX_DATA);
@@ -67,6 +66,7 @@ const Page = () => {
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
   const [network, setNetwork] = useState<number>(CHAIN_ID.OPTIMISM_GOERLI);
   const [, copyToClipboard] = useCopyToClipboard();
+  const [isParametersDialogOpen, setIsParametersDialogOpen] = useState(false);
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
@@ -132,11 +132,9 @@ const Page = () => {
     setRedirectUrl(data.redirectUrl);
 
     setClientId(data.clientId);
-  };
 
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
+    setIsParametersDialogOpen(false);
+  };
 
   // REDIRECT
   useEffect(() => {
@@ -182,8 +180,6 @@ const Page = () => {
 
     setToken(undefined);
   }, [chain]);
-
-  if (!hasMounted) return null;
 
   return (
     <>
@@ -267,10 +263,13 @@ const Page = () => {
         ) : null}
 
         <div className="absolute bottom-4 right-4 flex gap-4">
-          <Dialog>
+          <Dialog
+            open={isParametersDialogOpen}
+            onOpenChange={setIsParametersDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button variant="outline" className="rounded-full">
-                ?
+                Change Parameters
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-6xl">
