@@ -7,7 +7,12 @@ import {
   PopupOptions,
   RedirectOptions,
 } from "../types";
-import { buildAuthorizationUrl, generatePopup, handleRedirect } from "../utils";
+import {
+  buildAuthorizationUrl,
+  buildEnrolmentUrl,
+  generatePopup,
+  handleRedirect,
+} from "../utils";
 import { mode } from "../utils/mode";
 
 const VIOLET_CONTEXT = "violet_popup";
@@ -52,15 +57,26 @@ const authorize = async ({
 
   const channel = new BroadcastChannel(VIOLET_AUTHORIZATION_CHANNEL);
 
-  const url = buildAuthorizationUrl({
-    state,
-    transaction,
-    address,
-    chainId,
-    clientId,
-    redirectUrl,
-    apiUrl,
-  });
+  let url;
+
+  if (transaction)
+    url = buildAuthorizationUrl({
+      state,
+      transaction,
+      address,
+      chainId,
+      clientId,
+      redirectUrl,
+      apiUrl,
+    });
+  else
+    url = buildEnrolmentUrl({
+      address,
+      chainId,
+      clientId,
+      redirectUrl,
+      apiUrl,
+    });
 
   if (options.mode === "popup") {
     const popup = generatePopup({

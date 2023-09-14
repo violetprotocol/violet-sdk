@@ -19,7 +19,7 @@ type PopupOptions = {
 type AuthorizeProps = VioletConfigParams & {
   address: string;
   chainId: number;
-  transaction: {
+  transaction?: {
     functionSignature: string;
     data: string;
     targetContract: string;
