@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { createVioletClient } from "../lib";
 import { VioletConfigParams } from "../types";

@@ -1,3 +1,5 @@
+// "use client";
+
 import { useListenVioletEvents } from "@/hooks/useListenVioletEvents";
 import { AuthorizationEvent, AuthorizeProps } from "@/types";
 import { buildAuthorizationUrl } from "@/utils/buildAuthorizationUrl";

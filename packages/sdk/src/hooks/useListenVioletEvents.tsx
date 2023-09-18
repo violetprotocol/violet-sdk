@@ -1,3 +1,5 @@
+// "use client";
+
 import { useState, useEffect } from "react";
 import { VIOLET_AUTHORIZATION_CHANNEL } from "@/constants";
 import { AuthorizationEvent, AuthorizeVioletResponse } from "@/types";
