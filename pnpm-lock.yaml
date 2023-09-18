@@ -128,25 +128,41 @@ importers:
         version: 0.5.4(prettier@3.0.3)
 
   packages/sdk:
+    dependencies:
+      clsx:
+        specifier: ^2.0.0
+        version: 2.0.0
+      tailwind-merge:
+        specifier: ^1.14.0
+        version: 1.14.0
     devDependencies:
       '@types/react':
         specifier: ^18.2.21
         version: 18.2.21
+      autoprefixer:
+        specifier: ^10.4.15
+        version: 10.4.15(postcss@8.4.29)
       eslint:
         specifier: ^8.48.0
         version: 8.48.0
       eslint-config-custom:
         specifier: workspace:*
         version: link:../eslint-config-custom
+      postcss:
+        specifier: ^8.4.29
+        version: 8.4.29
       react:
         specifier: ^18.2.0
         version: 18.2.0
+      tailwindcss:
+        specifier: ^3.3.3
+        version: 3.3.3
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
       tsup:
         specifier: ^7.2.0
-        version: 7.2.0(typescript@5.2.2)
+        version: 7.2.0(postcss@8.4.29)(typescript@5.2.2)
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -186,7 +202,7 @@ importers:
         version: link:../tsconfig
       tsup:
         specifier: ^7.2.0
-        version: 7.2.0(typescript@5.2.2)
+        version: 7.2.0(postcss@8.4.29)(typescript@5.2.2)
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -217,7 +233,7 @@ importers:
         version: link:../tsconfig
       tsup:
         specifier: ^7.2.0
-        version: 7.2.0(typescript@5.2.2)
+        version: 7.2.0(postcss@8.4.29)(typescript@5.2.2)
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -4250,7 +4266,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.10
-      caniuse-lite: 1.0.30001520
+      caniuse-lite: 1.0.30001522
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -4417,7 +4433,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001520
+      caniuse-lite: 1.0.30001522
       electron-to-chromium: 1.4.490
       node-releases: 2.0.13
       update-browserslist-db: 1.0.11(browserslist@4.21.10)
@@ -4525,13 +4541,8 @@ packages:
     resolution: {integrity: sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==}
     engines: {node: '>=6'}
 
-  /caniuse-lite@1.0.30001520:
-    resolution: {integrity: sha512-tahF5O9EiiTzwTUqAeFjIZbn4Dnqxzz7ktrgGlMYNLH43Ul26IgTMH/zvL3DG0lZxBYnlT04axvInszUsZULdA==}
-    dev: true
-
   /caniuse-lite@1.0.30001522:
     resolution: {integrity: sha512-TKiyTVZxJGhsTszLuzb+6vUZSjVOAhClszBr2Ta2k9IwtNBT/4dzmL6aywt0HCgEZlmwJzXJd8yNiob6HgwTRg==}
-    dev: false
 
   /chai@4.3.8:
     resolution: {integrity: sha512-vX4YvVVtxlfSZ2VecZgFUTU5qPCYsobVI2O9FmwEXBhDigYGQA6jRXCycIs1yJnnWbZ6/+a2zNIF5DfVCcJBFQ==}
@@ -8420,7 +8431,7 @@ packages:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: false
 
-  /tsup@7.2.0(typescript@5.2.2):
+  /tsup@7.2.0(postcss@8.4.29)(typescript@5.2.2):
     resolution: {integrity: sha512-vDHlczXbgUvY3rWvqFEbSqmC1L7woozbzngMqTtL2PGBODTtWlRwGDDawhvWzr5c1QjKe4OAKqJGfE1xeXUvtQ==}
     engines: {node: '>=16.14'}
     hasBin: true
@@ -8444,6 +8455,7 @@ packages:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
+      postcss: 8.4.29
       postcss-load-config: 4.0.1(postcss@8.4.29)
       resolve-from: 5.0.0
       rollup: 3.28.0
