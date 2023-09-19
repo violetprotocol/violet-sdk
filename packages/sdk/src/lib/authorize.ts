@@ -1,5 +1,5 @@
 import { splitSignature } from "@ethersproject/bytes";
-import { API_URL, VIOLET_AUTHORIZATION_CHANNEL } from "../constants";
+import { VIOLET_AUTHORIZATION_CHANNEL } from "../constants";
 import {
   AuthorizeProps,
   AuthorizeResponse,
@@ -41,7 +41,7 @@ const authorize = async ({
   chainId,
   clientId,
   redirectUrl,
-  apiUrl = API_URL,
+  apiUrl,
   options = DEFAULT_OPTIONS,
 }: AuthorizeProps): Promise<AuthorizeResponse | void> => {
   if (typeof window === "undefined") {

@@ -17,6 +17,8 @@ type PopupOptions = {
 };
 
 type AuthorizeProps = VioletConfigParams & {
+  apiUrl: string;
+} & {
   address: string;
   chainId: number;
   transaction: {
@@ -45,7 +47,7 @@ type EAT = {
 
 type AuthorizeResponse = [
   { rawEAT: string; txId: string; eat: EAT } | null,
-  { code: string; txId?: string } | null
+  { code: string; txId?: string } | null,
 ];
 
 type AuthorizePartialProps = Omit<
@@ -56,6 +58,13 @@ type AuthorizePartialProps = Omit<
 type ConfiguredAuthorize = (
   authorizePartialProps: AuthorizePartialProps
 ) => Promise<AuthorizeResponse | void>;
+
+enum AuthorizationEvent {
+  INACTIVE = "INACTIVE",
+  LISTENING = "LISTENING",
+  ERROR = "ERROR",
+  COMPLETED = "COMPLETED",
+}
 
 export type {
   VioletConfigParams,
@@ -68,3 +77,5 @@ export type {
   AuthorizePartialProps,
   ConfiguredAuthorize,
 };
+
+export { AuthorizationEvent };

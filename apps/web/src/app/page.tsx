@@ -1,8 +1,12 @@
 "use client";
 
-import { useViolet, buildAuthorizationUrl } from "@violetprotocol/sdk";
+import {
+  useViolet,
+  buildAuthorizationUrl,
+  EmbeddedAuthorization,
+} from "@violetprotocol/sdk";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAccount, useConnect, useNetwork } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import {
@@ -67,6 +71,7 @@ const Page = () => {
   const [network, setNetwork] = useState<number>(CHAIN_ID.OPTIMISM_GOERLI);
   const [, copyToClipboard] = useCopyToClipboard();
   const [isParametersDialogOpen, setIsParametersDialogOpen] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
@@ -79,7 +84,7 @@ const Page = () => {
     },
   });
 
-  const { authorize } = useViolet({
+  const { authorize, IsRegisteredWithViolet } = useViolet({
     redirectUrl,
     clientId,
     apiUrl,
@@ -90,8 +95,6 @@ const Page = () => {
     functionSignature: transactionFunctionSignature,
     targetContract: transactionTargetContract,
   };
-
-  const handleIframe = () => {};
 
   // POPUP
   const handleAuthorize = async () => {
@@ -135,6 +138,12 @@ const Page = () => {
 
     setIsParametersDialogOpen(false);
   };
+
+  const checkRegistration = useCallback(async () => {
+    const isRegistered = await IsRegisteredWithViolet(address);
+
+    setIsRegistered(isRegistered);
+  }, [IsRegisteredWithViolet, address]);
 
   // REDIRECT
   useEffect(() => {
@@ -181,9 +190,22 @@ const Page = () => {
     setToken(undefined);
   }, [chain]);
 
+  useEffect(() => {
+    if (!address) return;
+
+    checkRegistration();
+  }, [address, checkRegistration]);
+
   return (
     <>
-      <span className="absolute top-4 right-4">{address}</span>
+      {address ? (
+        <span className="absolute top-4 right-4">{address}</span>
+      ) : null}
+      {address ? (
+        <span className="absolute top-4 left-4">
+          This address is {!isRegistered ? "not" : ""} enrolled
+        </span>
+      ) : null}
 
       <main className="flex h-screen justify-center items-center">
         {!isConnected ? (
@@ -375,18 +397,24 @@ const Page = () => {
                   Open Iframe
                 </Button>
               </DialogTrigger>
-              <DialogContent className="w-[432px] h-[464px] bg-neutral-50">
-                <iframe
-                  src={buildAuthorizationUrl({
+              <DialogContent className="bg-neutral-50">
+                <EmbeddedAuthorization
+                  apiUrl={apiUrl}
+                  authz={{
                     transaction,
                     address,
                     chainId: chain.id,
                     clientId,
                     redirectUrl,
                     apiUrl,
-                  })}
-                  width={IFRAME_WIDTH}
-                  height={IFRAME_HEIGHT}
+                  }}
+                  onIssued={(data) => {
+                    console.log(data);
+                  }}
+                  onFailed={(error) => {
+                    console.error(error);
+                  }}
+                  className="bg-neutral-50"
                 />
               </DialogContent>
             </Dialog>
