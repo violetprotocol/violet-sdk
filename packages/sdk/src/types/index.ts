@@ -16,6 +16,12 @@ type PopupOptions = {
   focus?: boolean;
 };
 
+type EnrollProps = VioletConfigParams & {
+  address: string;
+  chainId: number;
+  options?: RedirectOptions | PopupOptions;
+};
+
 type AuthorizeProps = VioletConfigParams & {
   apiUrl: string;
 } & {
@@ -45,6 +51,11 @@ type EAT = {
   expiry: number;
 };
 
+type EnrollmentResponse = [
+  { txId: string } | null,
+  { code: string; txId?: string } | null,
+];
+
 type AuthorizeResponse = [
   { rawEAT: string; txId: string; eat: EAT } | null,
   { code: string; txId?: string } | null,
@@ -68,6 +79,8 @@ enum AuthorizationEvent {
 
 export type {
   VioletConfigParams,
+  EnrollProps,
+  EnrollmentResponse,
   AuthorizeProps,
   AuthorizeResponse,
   AuthorizeVioletResponse,
