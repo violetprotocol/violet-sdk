@@ -16,7 +16,7 @@ type PopupOptions = {
   focus?: boolean;
 };
 
-type EnrolProps = VioletConfigParams & {
+type EnrollProps = VioletConfigParams & {
   address: string;
   chainId: number;
   options?: RedirectOptions | PopupOptions;
@@ -49,7 +49,7 @@ type EAT = {
   expiry: number;
 };
 
-type EnrolmentResponse = [
+type EnrollmentResponse = [
   { txId: string } | null,
   { code: string; txId?: string } | null,
 ];
@@ -70,8 +70,8 @@ type ConfiguredAuthorize = (
 
 export type {
   VioletConfigParams,
-  EnrolProps,
-  EnrolmentResponse,
+  EnrollProps,
+  EnrollmentResponse,
   AuthorizeProps,
   AuthorizeResponse,
   AuthorizeVioletResponse,

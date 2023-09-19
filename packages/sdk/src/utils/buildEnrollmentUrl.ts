@@ -1,6 +1,6 @@
-import { ENROL_ENDPOINT, ETHEREUM_NAMESPACE } from "../constants";
+import { ENROLL_ENDPOINT, ETHEREUM_NAMESPACE } from "../constants";
 
-const buildEnrolmentUrl = ({
+const buildEnrollmentUrl = ({
   address,
   chainId,
   clientId,
@@ -14,7 +14,7 @@ const buildEnrolmentUrl = ({
   redirectUrl: string;
   apiUrl: string;
 }) => {
-  const url = new URL(ENROL_ENDPOINT, apiUrl);
+  const url = new URL(ENROLL_ENDPOINT, apiUrl);
 
   url.searchParams.append(
     "account_id",
@@ -28,4 +28,4 @@ const buildEnrolmentUrl = ({
   return url.toString();
 };
 
-export { buildEnrolmentUrl };
+export { buildEnrollmentUrl };

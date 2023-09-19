@@ -1,4 +1,4 @@
 export * from "./authorize";
-export * from "./enrol";
+export * from "./enroll";
 
 export * from "./client";
