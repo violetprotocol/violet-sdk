@@ -1,15 +1,12 @@
 {
   "name": "@violetprotocol/sdk-thirdweb",
-  "version": "0.0.3",
-  "type": "module",
+  "version": "0.0.4",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist"
   },
-  "sideEffects": [
-    "**/*.css"
-  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

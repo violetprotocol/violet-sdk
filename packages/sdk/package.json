@@ -1,11 +1,12 @@
 {
   "name": "@violetprotocol/sdk",
-  "version": "0.0.19",
-  "type": "module",
+  "version": "0.0.20",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist"
+    ".": "./dist",
+    "./styles.css": "./dist/index.css"
   },
   "sideEffects": [
     "**/*.css"
