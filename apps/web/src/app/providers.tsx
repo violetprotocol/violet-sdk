@@ -13,8 +13,6 @@ import {
 } from "@wagmi/core/chains";
 import { publicProvider } from "wagmi/providers/public";
 
-import { VioletProvider } from "@violetprotocol/sdk";
-
 const { publicClient, webSocketPublicClient } = configureChains(
   [
     mainnet,
@@ -35,11 +33,7 @@ const config = createConfig({
 });
 
 const Providers = ({ children }: { children: ReactNode }) => {
-  return (
-    <WagmiConfig config={config}>
-      <VioletProvider>{children}</VioletProvider>
-    </WagmiConfig>
-  );
+  return <WagmiConfig config={config}>{children}</WagmiConfig>;
 };
 
 export default Providers;

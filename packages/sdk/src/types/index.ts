@@ -23,6 +23,8 @@ type EnrollProps = VioletConfigParams & {
 };
 
 type AuthorizeProps = VioletConfigParams & {
+  apiUrl: string;
+} & {
   address: string;
   chainId: number;
   transaction: {
@@ -68,6 +70,13 @@ type ConfiguredAuthorize = (
   authorizePartialProps: AuthorizePartialProps
 ) => Promise<AuthorizeResponse | void>;
 
+enum AuthorizationEvent {
+  INACTIVE = "INACTIVE",
+  LISTENING = "LISTENING",
+  ERROR = "ERROR",
+  COMPLETED = "COMPLETED",
+}
+
 export type {
   VioletConfigParams,
   EnrollProps,
@@ -81,3 +90,5 @@ export type {
   AuthorizePartialProps,
   ConfiguredAuthorize,
 };
+
+export { AuthorizationEvent };
