@@ -16,10 +16,16 @@ type PopupOptions = {
   focus?: boolean;
 };
 
+type EnrolProps = VioletConfigParams & {
+  address: string;
+  chainId: number;
+  options?: RedirectOptions | PopupOptions;
+};
+
 type AuthorizeProps = VioletConfigParams & {
   address: string;
   chainId: number;
-  transaction?: {
+  transaction: {
     functionSignature: string;
     data: string;
     targetContract: string;
@@ -43,9 +49,14 @@ type EAT = {
   expiry: number;
 };
 
+type EnrolmentResponse = [
+  { txId: string } | null,
+  { code: string; txId?: string } | null,
+];
+
 type AuthorizeResponse = [
   { rawEAT: string; txId: string; eat: EAT } | null,
-  { code: string; txId?: string } | null
+  { code: string; txId?: string } | null,
 ];
 
 type AuthorizePartialProps = Omit<
@@ -59,6 +70,8 @@ type ConfiguredAuthorize = (
 
 export type {
   VioletConfigParams,
+  EnrolProps,
+  EnrolmentResponse,
   AuthorizeProps,
   AuthorizeResponse,
   AuthorizeVioletResponse,
