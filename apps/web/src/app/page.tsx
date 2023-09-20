@@ -400,7 +400,7 @@ const Page = () => {
               <DialogContent className="bg-neutral-50">
                 <EmbeddedAuthorization
                   apiUrl={apiUrl}
-                  authz={{
+                  authorizeProps={{
                     transaction,
                     address,
                     chainId: chain.id,
