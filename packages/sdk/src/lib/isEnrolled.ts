@@ -5,9 +5,9 @@ import { ENROLLED_ENDPOINT } from "../constants";
  *
  * @async
  * @function isEnrolled
- * @param {Object} options - The authorization parameters and options.
+ * @param {Object} options - The enrollment check parameters and options.
  * @param {string} options.address - The address of the user.
- * @param {string} [options.apiUrl=API_URL] - The URL of the API for authorization. Defaults to API_URL.
+ * @param {string} [options.apiUrl=API_URL] - The URL of the API for enrollment check. Defaults to API_URL.
  * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the user is enrolled in Violet.
  * @throws - If an unknown error occurs while fetching and parsing the enrollment status.
  */
