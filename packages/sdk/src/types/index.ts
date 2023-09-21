@@ -1,4 +1,5 @@
 import { mode } from "../lib";
+import type { Signature } from "@ethersproject/bytes";
 
 type VioletConfigParams = {
   clientId: string;
@@ -46,11 +47,7 @@ type AuthorizeVioletResponse =
     };
 
 type EAT = {
-  signature: {
-    r: string;
-    s: string;
-    v: 0 | 1 | 27 | 28;
-  };
+  signature: Signature;
   expiry: number;
 };
 
