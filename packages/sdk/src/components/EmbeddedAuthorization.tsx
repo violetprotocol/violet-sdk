@@ -6,6 +6,7 @@ import { buildAuthorizationUrl } from "@/utils/buildAuthorizationUrl";
 import { cn } from "@/utils/cn";
 import { IframeHTMLAttributes, forwardRef, useEffect } from "react";
 import type { Signature } from "@ethersproject/bytes";
+import { VIOLET_AUTHORIZATION_CHANNEL } from "..";
 
 const IFRAME_MIN_WIDTH = 384;
 const IFRAME_MIN_HEIGHT = 524;
@@ -22,6 +23,7 @@ type EmbeddedAuthorizationProps = Omit<
     expiry: number;
   }) => void;
   onFailed: (error: { code: string; txId: string }) => void;
+  channel?: string;
   width?: number;
   height?: number;
 };
@@ -36,6 +38,7 @@ const EmbeddedAuthorization = forwardRef<
       onIssued,
       onFailed,
       className,
+      channel = VIOLET_AUTHORIZATION_CHANNEL,
       width = IFRAME_MIN_WIDTH,
       height = IFRAME_MIN_HEIGHT,
       ...props
@@ -54,7 +57,7 @@ const EmbeddedAuthorization = forwardRef<
       );
     }
 
-    const payload = useListenVioletEvents();
+    const payload = useListenVioletEvents(channel);
 
     useEffect(() => {
       if (payload.event === AuthorizationEvent.COMPLETED) {

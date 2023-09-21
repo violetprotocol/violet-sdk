@@ -24,7 +24,7 @@ const useIFrameExecutor = ({
 
   useEffect(() => {
     ref.current = w3.connector;
-  }, [sourceRef?.current, targetRef?.current]);
+  }, [w3.connector]);
 
   useIFrameTransport({
     async requestExecutor(request) {

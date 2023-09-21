@@ -31,7 +31,7 @@ const useIFrameTransport = ({
       eventTarget: targetRef.current,
     });
     return () => transportRef.current?.cleanup();
-  }, [sourceRef?.current, targetRef?.current]);
+  }, [requestExecutor, sourceRef, targetRef]);
 
   return transportRef;
 };

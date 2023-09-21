@@ -11,8 +11,8 @@ import { useEffect, useRef } from "react";
 import { useIFrameTransport, IFrameMessageKind } from "@violetprotocol/sdk";
 
 const useIFrameWalletConfig = () => {
-  const sourceRef = useRef<any>();
-  const targetRef = useRef<any>();
+  const sourceRef = useRef<Window | null>(null);
+  const targetRef = useRef<Window | null>(null);
 
   useEffect(() => {
     sourceRef.current = window;
