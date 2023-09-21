@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { VIOLET_AUTHORIZATION_CHANNEL } from "@/constants";
 import { AuthorizationEvent, AuthorizeVioletResponse } from "@/types";
-import { secp256k1 } from "@noble/curves/secp256k1";
+import { splitSignature } from "@ethersproject/bytes";
+import type { Signature } from "@ethersproject/bytes";
 
 type PayloadType =
   | {
@@ -26,11 +27,7 @@ type PayloadType =
       data: {
         token: string;
         txId: string;
-        signature: {
-          r: string;
-          s: string;
-          v: 0 | 1 | 27 | 28;
-        };
+        signature: Signature;
         expiry: number;
       };
     };
@@ -95,21 +92,7 @@ const useListenVioletEvents = (
           return;
         }
 
-        const { r, s } = secp256k1.Signature.fromCompact(
-          parsedEAT.signature.slice(2, 130)
-        );
-
-        const v = parseInt(`0x${parsedEAT.signature.slice(130)}`, 16) as
-          | 0
-          | 1
-          | 27
-          | 28;
-
-        const signature = {
-          r: `0x${r.toString(16)}`,
-          s: `0x${s.toString(16)}`,
-          v,
-        };
+        const signature = splitSignature(parsedEAT.signature);
 
         setPayload({
           event: AuthorizationEvent.COMPLETED,

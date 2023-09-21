@@ -5,6 +5,7 @@ import { AuthorizationEvent, AuthorizeProps } from "@/types";
 import { buildAuthorizationUrl } from "@/utils/buildAuthorizationUrl";
 import { cn } from "@/utils/cn";
 import { IframeHTMLAttributes, forwardRef, useEffect } from "react";
+import type { Signature } from "@ethersproject/bytes";
 
 const IFRAME_MIN_WIDTH = 384;
 const IFRAME_MIN_HEIGHT = 524;
@@ -18,11 +19,7 @@ type EmbeddedAuthorizationProps = Omit<
   onIssued: (data: {
     token: string;
     txId: string;
-    signature: {
-      r: string;
-      s: string;
-      v: 0 | 1 | 27 | 28;
-    };
+    signature: Signature;
     expiry: number;
   }) => void;
   onFailed: (error: { code: string; txId: string }) => void;
