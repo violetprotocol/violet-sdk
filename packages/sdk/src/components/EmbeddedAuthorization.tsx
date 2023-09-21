@@ -14,7 +14,6 @@ type EmbeddedAuthorizationProps = Omit<
   IframeHTMLAttributes<HTMLIFrameElement>,
   "src" | "srcDoc" | "allow" | "name"
 > & {
-  apiUrl: string;
   authorizeProps: AuthorizeProps;
   onIssued: (data: {
     token: string;
