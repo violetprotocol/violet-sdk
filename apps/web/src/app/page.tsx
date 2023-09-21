@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  useViolet,
+  // useViolet,
   buildAuthorizationUrl,
   EmbeddedAuthorization,
 } from "@violetprotocol/sdk";
@@ -84,11 +84,11 @@ const Page = () => {
     },
   });
 
-  const { authorize, IsRegisteredWithViolet } = useViolet({
-    redirectUrl,
-    clientId,
-    apiUrl,
-  });
+  // const { authorize, IsRegisteredWithViolet } = useViolet({
+  //   redirectUrl,
+  //   clientId,
+  //   apiUrl,
+  // });
 
   const transaction = {
     data: transactionData,
@@ -96,28 +96,28 @@ const Page = () => {
     targetContract: transactionTargetContract,
   };
 
-  // POPUP
-  const handleAuthorize = async () => {
-    const response = await authorize({
-      transaction,
-      chainId: chain.id,
-      address,
-    });
+  // // POPUP
+  // const handleAuthorize = async () => {
+  //   const response = await authorize({
+  //     transaction,
+  //     chainId: chain.id,
+  //     address,
+  //   });
 
-    if (!response) return;
+  //   if (!response) return;
 
-    const [eat, error] = response;
+  //   const [eat, error] = response;
 
-    if (error) {
-      console.error(error);
+  //   if (error) {
+  //     console.error(error);
 
-      setError(true);
-    }
+  //     setError(true);
+  //   }
 
-    if (eat) {
-      setToken(eat.rawEAT);
-    }
-  };
+  //   if (eat) {
+  //     setToken(eat.rawEAT);
+  //   }
+  // };
 
   const handleConnect = async () => {
     await connect();
@@ -139,11 +139,11 @@ const Page = () => {
     setIsParametersDialogOpen(false);
   };
 
-  const checkRegistration = useCallback(async () => {
-    const isRegistered = await IsRegisteredWithViolet(address);
+  // const checkRegistration = useCallback(async () => {
+  //   const isRegistered = await IsRegisteredWithViolet(address);
 
-    setIsRegistered(isRegistered);
-  }, [IsRegisteredWithViolet, address]);
+  //   setIsRegistered(isRegistered);
+  // }, [IsRegisteredWithViolet, address]);
 
   // REDIRECT
   useEffect(() => {
@@ -190,11 +190,11 @@ const Page = () => {
     setToken(undefined);
   }, [chain]);
 
-  useEffect(() => {
-    if (!address) return;
+  // useEffect(() => {
+  //   if (!address) return;
 
-    checkRegistration();
-  }, [address, checkRegistration]);
+  //   checkRegistration();
+  // }, [address, checkRegistration]);
 
   return (
     <>
@@ -242,7 +242,7 @@ const Page = () => {
           </div>
         ) : null}
 
-        {isConnected && !token && !error ? (
+        {/* {isConnected && !token && !error ? (
           <div
             id="CONNECTED_NOT_AUTHORIZED"
             className="h-36 w-36 cursor-pointer"
@@ -267,7 +267,7 @@ const Page = () => {
               />
             </svg>
           </div>
-        ) : null}
+        ) : null} */}
 
         {isConnected && token && !error ? (
           <div id="CONNECTED_AND_AUTHORIZED" className="h-36 w-36">
@@ -398,7 +398,7 @@ const Page = () => {
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-neutral-50">
-                <EmbeddedAuthorization
+                {/* <EmbeddedAuthorization
                   apiUrl={apiUrl}
                   authorizeProps={{
                     transaction,
@@ -415,7 +415,7 @@ const Page = () => {
                     console.error(error);
                   }}
                   className="bg-neutral-50"
-                />
+                /> */}
               </DialogContent>
             </Dialog>
           ) : null}
