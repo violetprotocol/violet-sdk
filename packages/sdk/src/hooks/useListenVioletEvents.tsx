@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { VIOLET_AUTHORIZATION_CHANNEL } from "@/constants";
 import { AuthorizationEvent, AuthorizeVioletResponse } from "@/types";
-import { splitSignature } from "@ethersproject/bytes";
+import { secp256k1 } from "@noble/curves/secp256k1";
 
 type PayloadType =
   | {
@@ -29,20 +29,23 @@ type PayloadType =
         signature: {
           r: string;
           s: string;
-          v: number;
+          v: 0 | 1 | 27 | 28;
         };
         expiry: number;
       };
     };
 
-const useListenVioletEvents = () => {
+const useListenVioletEvents = (
+  channel: string = VIOLET_AUTHORIZATION_CHANNEL
+) => {
   const [payload, setPayload] = useState<PayloadType>({
     event: AuthorizationEvent.INACTIVE,
     data: {},
   });
 
   useEffect(() => {
-    const channel = new BroadcastChannel(VIOLET_AUTHORIZATION_CHANNEL);
+    const broadcastChannel = new BroadcastChannel(channel);
+
     setPayload({ event: AuthorizationEvent.LISTENING, data: {} });
 
     const listener = (event: MessageEvent<AuthorizeVioletResponse>) => {
@@ -70,7 +73,18 @@ const useListenVioletEvents = () => {
       if ("token" in event.data) {
         const eat = event.data.token;
 
-        const parsedEAT = JSON.parse(atob(eat));
+        let parsedEAT;
+
+        try {
+          parsedEAT = JSON.parse(atob(eat));
+        } catch (e) {
+          setPayload({
+            event: AuthorizationEvent.ERROR,
+            data: { code: "EAT_MALFORMED", txId: event.data.tx_id },
+          });
+
+          return;
+        }
 
         if (!parsedEAT?.signature || !parsedEAT?.expiry) {
           setPayload({
@@ -81,7 +95,21 @@ const useListenVioletEvents = () => {
           return;
         }
 
-        const signature = splitSignature(parsedEAT.signature);
+        const { r, s } = secp256k1.Signature.fromCompact(
+          parsedEAT.signature.slice(2, 130)
+        );
+
+        const v = parseInt(`0x${parsedEAT.signature.slice(130)}`, 16) as
+          | 0
+          | 1
+          | 27
+          | 28;
+
+        const signature = {
+          r: `0x${r.toString(16)}`,
+          s: `0x${s.toString(16)}`,
+          v,
+        };
 
         setPayload({
           event: AuthorizationEvent.COMPLETED,
@@ -99,10 +127,10 @@ const useListenVioletEvents = () => {
       throw new Error("UNKNOWN_ERROR_VIOLET_EMBEDDED_AUTHORIZATION");
     };
 
-    channel.addEventListener("message", listener, {
+    broadcastChannel.addEventListener("message", listener, {
       once: true,
     });
-  }, []);
+  }, [channel]);
 
   return payload;
 };
