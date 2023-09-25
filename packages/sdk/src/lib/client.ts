@@ -4,11 +4,12 @@ import {
   ConfiguredEnroll,
   EnrollmentPartialProps,
   VioletConfigParams,
-} from "../types";
-import { authorize } from "./authorize";
-import { enroll } from "./enroll";
-import { isEnrolled } from "./isEnrolled";
-import { API_URL } from "..";
+} from "@/types";
+import { API_URL } from "@/constants";
+
+import { authorize } from "@/lib/authorize";
+import { enroll } from "@/lib/enroll";
+import { isEnrolled } from "@/lib/isEnrolled";
 
 const createVioletClient = ({
   clientId,
@@ -17,27 +18,21 @@ const createVioletClient = ({
 }: VioletConfigParams): {
   authorize: ConfiguredAuthorize;
   enroll: ConfiguredEnroll;
-  IsRegisteredWithViolet: (address: string) => Promise<boolean>;
+  isEnrolled: (address: string) => Promise<boolean>;
 } => {
-  const configuredAuthorize = async (
-    authorizePartialProps: AuthorizePartialProps
-  ) => authorize({ clientId, redirectUrl, apiUrl, ...authorizePartialProps });
-
-  const configuredEnroll = async (
-    enrollmentPartialProps: EnrollmentPartialProps
-  ) => enroll({ clientId, redirectUrl, apiUrl, ...enrollmentPartialProps });
-
-  const configuredIsRegisteredWithViolet = async (address: string) =>
-    isEnrolled({
-      address,
-      apiUrl,
-    });
-
-  return {
-    authorize: configuredAuthorize,
-    enroll: configuredEnroll,
-    IsRegisteredWithViolet: configuredIsRegisteredWithViolet,
+  const client = {
+    authorize: async (authorizePartialProps: AuthorizePartialProps) =>
+      authorize({ clientId, redirectUrl, apiUrl, ...authorizePartialProps }),
+    enroll: async (enrollmentPartialProps: EnrollmentPartialProps) =>
+      enroll({ clientId, redirectUrl, apiUrl, ...enrollmentPartialProps }),
+    isEnrolled: async (address: string) =>
+      isEnrolled({
+        address,
+        apiUrl,
+      }),
   };
+
+  return client;
 };
 
 export { createVioletClient };

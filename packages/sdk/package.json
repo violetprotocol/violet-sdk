@@ -1,6 +1,6 @@
 {
   "name": "@violetprotocol/sdk",
-  "version": "0.0.27",
+  "version": "0.0.32",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -14,7 +14,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "prepublish": "pnpm run build"
   },
   "peerDependencies": {
     "react": "^18.2.0"
@@ -32,6 +33,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@ethersproject/address": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
     "clsx": "^2.0.0",
     "tailwind-merge": "^1.14.0"

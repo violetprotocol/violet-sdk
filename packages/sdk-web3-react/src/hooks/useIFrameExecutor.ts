@@ -28,9 +28,7 @@ const useIFrameExecutor = ({
 
   useIFrameTransport({
     async requestExecutor(request) {
-      console.log(`[PARENT REQUEST EXECUTOR]: `, request);
-
-      if (!ref.current) throw new Error("No connector found");
+      if (!ref.current) throw new Error("NO_CONNECTOR_FOUND");
 
       const connector = ref.current;
 
@@ -38,14 +36,13 @@ const useIFrameExecutor = ({
         (connector.customProvider as typeof w3.connector.provider) ||
         w3.connector.provider;
 
-      if (!provider) throw new Error("No provider found");
+      if (!provider) throw new Error("NO_PROVIDER_FOUND");
 
-      // check if request is RequestArguments
       if (typeof request === "string") {
         return provider.request({ method: request });
       }
 
-      throw new Error("Invalid request");
+      throw new Error("INVALID_REQUEST");
     },
     sourceRef,
     targetRef,
