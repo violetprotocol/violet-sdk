@@ -4,7 +4,7 @@ import { VioletContext } from "@/providers/VioletProvider";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { isAddress } from "@ethersproject/address";
 
-const useViolet = ({ address }: { address: string }) => {
+const useViolet = ({ address }: { address?: string }) => {
   const client = useContext(VioletContext);
 
   if (!client) {
@@ -14,7 +14,7 @@ const useViolet = ({ address }: { address: string }) => {
   const [isEnrolled, setIsEnrolled] = useState<boolean>();
 
   const updateUserIsEnrolled = useCallback(async () => {
-    if (!address) return;
+    if (!address) throw new Error("NO_ADDRESS_DEFINED");
 
     const isEnrolled = await client.isEnrolled(address);
 
@@ -22,9 +22,7 @@ const useViolet = ({ address }: { address: string }) => {
   }, [address, client]);
 
   useEffect(() => {
-    if (!address) {
-      return;
-    }
+    if (!address) return;
 
     if (!isAddress(address)) {
       throw new Error("INVALID_ADDRESS");
