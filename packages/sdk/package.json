@@ -1,6 +1,6 @@
 {
   "name": "@violetprotocol/sdk",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -32,6 +32,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@ethersproject/address": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
     "clsx": "^2.0.0",
     "tailwind-merge": "^1.14.0"
