@@ -1,6 +1,6 @@
 // "use client";
 
-import { useListenVioletEvents } from "@/hooks/useListenVioletEvents";
+import { useListenVioletAuthorization } from "@/hooks/useListenVioletAuthorization";
 import { AuthorizationEvent, AuthorizeProps } from "@/types";
 import { buildAuthorizationUrl } from "@/utils/buildAuthorizationUrl";
 import { cn } from "@/utils/cn";
@@ -57,7 +57,7 @@ const EmbeddedAuthorization = forwardRef<
       );
     }
 
-    const payload = useListenVioletEvents(channel);
+    const payload = useListenVioletAuthorization(channel);
 
     useEffect(() => {
       if (payload.event === AuthorizationEvent.COMPLETED) {
@@ -74,16 +74,23 @@ const EmbeddedAuthorization = forwardRef<
     });
 
     return (
-      <iframe
-        className={cn("border-none rounded-2xl", className)}
-        name="violet-authorization"
-        ref={ref}
-        src={url}
-        width={width}
-        height={height}
-        allow="clipboard-write; clipboard-read; geolocation"
-        {...props}
-      />
+      <div
+        className={cn(
+          "w-full h-full flex justify-center items-center",
+          className
+        )}
+      >
+        <iframe
+          className="border-none rounded-2xl"
+          name="violet-authorization"
+          ref={ref}
+          src={url}
+          width={width}
+          height={height}
+          allow="clipboard-write; clipboard-read; geolocation"
+          {...props}
+        />
+      </div>
     );
   }
 );

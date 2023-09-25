@@ -23,14 +23,17 @@ const useIFrameTransport = ({
   useEffect(() => {
     if (transportRef.current) transportRef.current.cleanup();
 
-    if (!sourceRef?.current) return;
-    if (!targetRef?.current) return;
+    if (!sourceRef.current) return;
+    if (!targetRef.current) return;
 
     transportRef.current = new IFrameTransport(requestExecutor, {
       eventSource: sourceRef.current,
       eventTarget: targetRef.current,
     });
-    return () => transportRef.current?.cleanup();
+
+    return () => {
+      if (transportRef.current) transportRef.current.cleanup();
+    };
   }, [requestExecutor, sourceRef, targetRef]);
 
   return transportRef;

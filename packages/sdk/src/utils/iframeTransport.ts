@@ -129,7 +129,7 @@ class IFrameTransport {
       if (this.completers[id]) {
         this.completers[id].reject(
           new Error(
-            `IFrameTransport Request with ID "${id}" timed out after ${this.timeoutMilliseconds} milliseconds`
+            `IFRAME_TRANSPORT_REQUEST_ID_${id}_TIMEOUT_AFTER_${this.timeoutMilliseconds}_MS`
           )
         );
 
@@ -179,9 +179,7 @@ class IFrameTransport {
         } else if (message.failure) {
           completer.reject(message);
         } else {
-          completer.reject(
-            new Error("Response from provider did not have error or result key")
-          );
+          completer.reject(new Error("RESPONSE_MALFORMED"));
         }
         delete this.completers[message.id];
       }

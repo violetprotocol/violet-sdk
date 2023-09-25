@@ -32,9 +32,9 @@ const useIFrameExecutor = ({
 
       const connector = ref.current;
 
-      const provider =
-        (connector.customProvider as typeof w3.connector.provider) ||
-        w3.connector.provider;
+      let provider = connector.customProvider as typeof w3.connector.provider;
+
+      if (!provider) provider = w3.connector.provider;
 
       if (!provider) throw new Error("NO_PROVIDER_FOUND");
 

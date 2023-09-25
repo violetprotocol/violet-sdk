@@ -32,7 +32,7 @@ type PayloadType =
       };
     };
 
-const useListenVioletEvents = (
+const useListenVioletAuthorization = (
   channel: string = VIOLET_AUTHORIZATION_CHANNEL
 ) => {
   const [payload, setPayload] = useState<PayloadType>({
@@ -118,4 +118,4 @@ const useListenVioletEvents = (
   return payload;
 };
 
-export { useListenVioletEvents };
+export { useListenVioletAuthorization };
