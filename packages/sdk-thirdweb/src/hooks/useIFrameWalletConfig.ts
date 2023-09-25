@@ -1,14 +1,7 @@
-import { providers } from "ethers";
-import {
-  AbstractClientWallet,
-  Connector,
-  WagmiAdapter,
-  AsyncStorage,
-} from "@thirdweb-dev/wallets";
-import { InjectedConnector } from "@thirdweb-dev/wallets/evm/connectors/injected";
-import { WalletConfig } from "@thirdweb-dev/react";
 import { useEffect, useRef } from "react";
 import { useIFrameTransport, IFrameMessageKind } from "@violetprotocol/sdk";
+import { iframeWallet } from "../utils";
+import type { RequestProps } from "../types";
 
 const useIFrameWalletConfig = () => {
   const sourceRef = useRef<Window | null>(null);
@@ -63,70 +56,5 @@ const useIFrameWalletConfig = () => {
       request: (method, params) => request({ method, params }),
     });
 };
-
-interface IFrameWalletConfig {
-  request: providers.JsonRpcFetchFunc;
-}
-
-function iframeWallet(
-  options?: IFrameWalletConfig
-): WalletConfig<IFrameWallet> {
-  const id = "iframe-wallet";
-
-  return {
-    id,
-    meta: {
-      name: "IFrame Wallet",
-      // @TODO: This URL is for demo purpose only. DON'T use in production.
-      iconURL:
-        "https://cdn0.iconfinder.com/data/icons/finance-development/512/CEO-22-512.png",
-    },
-
-    create(walletOptions) {
-      return new IFrameWallet(id, { ...walletOptions, ...options } as any);
-    },
-
-    isInstalled() {
-      return true;
-    },
-  };
-}
-
-interface RequestProps {
-  method: any;
-  params: any;
-}
-
-interface IFrameWalletOptions {
-  request: providers.JsonRpcFetchFunc;
-}
-
-class IFrameWallet extends AbstractClientWallet<IFrameWalletOptions> {
-  async getConnector(): Promise<Connector> {
-    return createConnector(this.options!.request, this.walletStorage);
-  }
-}
-
-function createConnector(
-  request: providers.JsonRpcFetchFunc,
-  connectorStorage: AsyncStorage
-): Connector {
-  const connector = new InjectedConnector({
-    connectorStorage,
-    options: {
-      getProvider: () => {
-        return {
-          isMetaMask: false,
-          _events: {},
-          request: ({ method, params }: any) => {
-            return request(method, params);
-          },
-        } as any; // HACK: Overwrite TypeScript's type checking
-      },
-    },
-  });
-  const adapter = new WagmiAdapter(connector);
-  return adapter;
-}
 
 export { useIFrameWalletConfig };
