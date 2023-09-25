@@ -11,7 +11,7 @@ const useViolet = ({ address }: { address?: string }) => {
     throw new Error("USE_VIOLET_OUTSIDE_PROVIDER");
   }
 
-  const [isEnrolled, setIsEnrolled] = useState<boolean>();
+  const [isEnrolled, setIsEnrolled] = useState(false);
 
   const updateUserIsEnrolled = useCallback(async () => {
     if (!address) throw new Error("NO_ADDRESS_DEFINED");
@@ -35,6 +35,7 @@ const useViolet = ({ address }: { address?: string }) => {
     authorize: client.authorize,
     enroll: client.enroll,
     isEnrolled,
+    updateUserIsEnrolled,
   };
 };
 
