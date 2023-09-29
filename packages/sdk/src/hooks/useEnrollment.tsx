@@ -14,11 +14,15 @@ const useEnrollment = ({ userAddress }: { userAddress?: string }) => {
   const [isEnrolled, setIsEnrolled] = useState(false);
 
   const checkEnrollmentStatus = useCallback(async () => {
-    if (!userAddress) throw new Error("NO_USER_ADDRESS_DEFINED");
+    try {
+      if (!userAddress) throw new Error("NO_USER_ADDRESS_DEFINED");
 
-    const isEnrolled = await client.isEnrolled(userAddress);
+      const isEnrolled = await client.isEnrolled(userAddress);
 
-    setIsEnrolled(isEnrolled);
+      setIsEnrolled(isEnrolled);
+    } catch (error) {
+      console.error(error);
+    }
   }, [userAddress, client]);
 
   useEffect(() => {
