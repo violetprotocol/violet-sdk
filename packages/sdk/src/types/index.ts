@@ -4,7 +4,7 @@ import type { Signature } from "@ethersproject/bytes";
 type VioletConfigParams = {
   clientId: string;
   redirectUrl: string;
-  apiUrl?: string;
+  apiUrl: string;
 };
 
 type RedirectOptions = {

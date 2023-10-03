@@ -1,9 +1,12 @@
 import { createVioletClient } from "@/lib";
-import { ReactNode, createContext } from "react";
+import { ReactNode, createContext, useState } from "react";
 
-const VioletContext = createContext<ReturnType<
-  typeof createVioletClient
-> | null>(null);
+const VioletContext = createContext<
+  | (ReturnType<typeof createVioletClient> & {
+      setCurrentClient: (client: ReturnType<typeof createVioletClient>) => void;
+    })
+  | null
+>(null);
 
 const VioletProvider = ({
   children,
@@ -12,8 +15,13 @@ const VioletProvider = ({
   children: ReactNode;
   client: ReturnType<typeof createVioletClient>;
 }) => {
+  const [currentClient, setCurrentClient] =
+    useState<ReturnType<typeof createVioletClient>>(client);
+
   return (
-    <VioletContext.Provider value={client}>{children}</VioletContext.Provider>
+    <VioletContext.Provider value={{ ...currentClient, setCurrentClient }}>
+      {children}
+    </VioletContext.Provider>
   );
 };
 

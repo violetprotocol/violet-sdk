@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useIFrameTransport, IFrameMessageKind } from "@violetprotocol/sdk";
-import { providers } from "ethers";
+import { JsonRpcFetchFunc } from "@ethersproject/providers";
 import {
   AbstractClientWallet,
   Connector,
@@ -12,11 +12,11 @@ import { WalletConfig } from "@thirdweb-dev/react";
 import { Ethereum } from "@thirdweb-dev/wallets/dist/declarations/src/evm/connectors/injected/types";
 
 type IFrameWalletConfig = {
-  request: providers.JsonRpcFetchFunc;
+  request: JsonRpcFetchFunc;
 };
 
 type IFrameWalletOptions = {
-  request: providers.JsonRpcFetchFunc;
+  request: JsonRpcFetchFunc;
 };
 
 const iframeWallet = (
@@ -52,7 +52,7 @@ class IFrameWallet extends AbstractClientWallet<IFrameWalletOptions> {
 }
 
 const createConnector = (
-  request: providers.JsonRpcFetchFunc,
+  request: JsonRpcFetchFunc,
   connectorStorage: AsyncStorage
 ): Connector => {
   const connector = new InjectedConnector({

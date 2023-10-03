@@ -19,6 +19,7 @@ const createVioletClient = ({
   authorize: ConfiguredAuthorize;
   enroll: ConfiguredEnroll;
   isEnrolled: (address: string) => Promise<boolean>;
+  config: VioletConfigParams;
 } => {
   const client = {
     authorize: async (authorizePartialProps: AuthorizePartialProps) =>
@@ -30,6 +31,11 @@ const createVioletClient = ({
         address,
         apiUrl,
       }),
+    config: {
+      clientId,
+      redirectUrl,
+      apiUrl,
+    },
   };
 
   return client;
