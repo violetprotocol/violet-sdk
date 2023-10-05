@@ -1,12 +1,15 @@
 "use client";
 
 import {
-  // useViolet,
   buildAuthorizationUrl,
+  createVioletClient,
   EmbeddedAuthorization,
+  useAuthorization,
+  useClient,
+  useEnrollment,
 } from "@violetprotocol/sdk";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useConnect, useNetwork } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import {
@@ -71,7 +74,6 @@ const Page = () => {
   const [network, setNetwork] = useState<number>(CHAIN_ID.OPTIMISM_GOERLI);
   const [, copyToClipboard] = useCopyToClipboard();
   const [isParametersDialogOpen, setIsParametersDialogOpen] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
@@ -84,11 +86,13 @@ const Page = () => {
     },
   });
 
-  // const { authorize, IsRegisteredWithViolet } = useViolet({
-  //   redirectUrl,
-  //   clientId,
-  //   apiUrl,
-  // });
+  const { authorize } = useAuthorization();
+
+  const { isEnrolled, checkEnrollmentStatus } = useEnrollment({
+    userAddress: address,
+  });
+
+  const { setCurrentClient } = useClient();
 
   const transaction = {
     data: transactionData,
@@ -96,28 +100,28 @@ const Page = () => {
     targetContract: transactionTargetContract,
   };
 
-  // // POPUP
-  // const handleAuthorize = async () => {
-  //   const response = await authorize({
-  //     transaction,
-  //     chainId: chain.id,
-  //     address,
-  //   });
+  // POPUP
+  const handleAuthorize = async () => {
+    const response = await authorize({
+      transaction,
+      chainId: chain.id,
+      address,
+    });
 
-  //   if (!response) return;
+    if (!response) return;
 
-  //   const [eat, error] = response;
+    const [eat, error] = response;
 
-  //   if (error) {
-  //     console.error(error);
+    if (error) {
+      console.error(error);
 
-  //     setError(true);
-  //   }
+      setError(true);
+    }
 
-  //   if (eat) {
-  //     setToken(eat.rawEAT);
-  //   }
-  // };
+    if (eat) {
+      setToken(eat.rawEAT);
+    }
+  };
 
   const handleConnect = async () => {
     await connect();
@@ -126,24 +130,26 @@ const Page = () => {
   const handleParametersSubmit: SubmitHandler<FormValues> = (data) => {
     setApiUrl(data.apiUrl);
 
+    setRedirectUrl(data.redirectUrl);
+
+    setClientId(data.clientId);
+
+    const client = createVioletClient({
+      clientId: data.clientId,
+      apiUrl: data.apiUrl,
+      redirectUrl: data.redirectUrl,
+    });
+
+    setCurrentClient(client);
+
     setTransactionData(data.transactionData);
 
     setTransactionFunctionSignature(data.transactionFunctionSignature);
 
     setTransactionTargetContract(data.transactionTargetContract);
 
-    setRedirectUrl(data.redirectUrl);
-
-    setClientId(data.clientId);
-
     setIsParametersDialogOpen(false);
   };
-
-  // const checkRegistration = useCallback(async () => {
-  //   const isRegistered = await IsRegisteredWithViolet(address);
-
-  //   setIsRegistered(isRegistered);
-  // }, [IsRegisteredWithViolet, address]);
 
   // REDIRECT
   useEffect(() => {
@@ -190,11 +196,11 @@ const Page = () => {
     setToken(undefined);
   }, [chain]);
 
-  // useEffect(() => {
-  //   if (!address) return;
+  useEffect(() => {
+    if (!address) return;
 
-  //   checkRegistration();
-  // }, [address, checkRegistration]);
+    checkEnrollmentStatus();
+  }, [address, checkEnrollmentStatus]);
 
   return (
     <>
@@ -203,7 +209,7 @@ const Page = () => {
       ) : null}
       {address ? (
         <span className="absolute top-4 left-4">
-          This address is {!isRegistered ? "not" : ""} enrolled
+          This address is {!isEnrolled ? "not" : ""} enrolled
         </span>
       ) : null}
 
@@ -242,7 +248,7 @@ const Page = () => {
           </div>
         ) : null}
 
-        {/* {isConnected && !token && !error ? (
+        {isConnected && !token && !error ? (
           <div
             id="CONNECTED_NOT_AUTHORIZED"
             className="h-36 w-36 cursor-pointer"
@@ -267,7 +273,7 @@ const Page = () => {
               />
             </svg>
           </div>
-        ) : null} */}
+        ) : null}
 
         {isConnected && token && !error ? (
           <div id="CONNECTED_AND_AUTHORIZED" className="h-36 w-36">
@@ -398,15 +404,11 @@ const Page = () => {
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-neutral-50">
-                {/* <EmbeddedAuthorization
-                  apiUrl={apiUrl}
+                <EmbeddedAuthorization
                   authorizeProps={{
                     transaction,
                     address,
                     chainId: chain.id,
-                    clientId,
-                    redirectUrl,
-                    apiUrl,
                   }}
                   onIssued={(data) => {
                     console.log(data);
@@ -415,7 +417,7 @@ const Page = () => {
                     console.error(error);
                   }}
                   className="bg-neutral-50"
-                /> */}
+                />
               </DialogContent>
             </Dialog>
           ) : null}

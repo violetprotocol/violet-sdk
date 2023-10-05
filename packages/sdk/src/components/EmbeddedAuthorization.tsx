@@ -1,12 +1,12 @@
 // "use client";
 
 import { useListenVioletAuthorization } from "@/hooks/useListenVioletAuthorization";
-import { AuthorizationEvent, AuthorizeProps } from "@/types";
+import { AuthorizationEvent, AuthorizePartialProps } from "@/types";
 import { buildAuthorizationUrl } from "@/utils/buildAuthorizationUrl";
 import { cn } from "@/utils/cn";
 import { IframeHTMLAttributes, forwardRef, useEffect } from "react";
 import type { Signature } from "@ethersproject/bytes";
-import { VIOLET_AUTHORIZATION_CHANNEL } from "..";
+import { VIOLET_AUTHORIZATION_CHANNEL, useClient } from "..";
 
 const IFRAME_MIN_WIDTH = 384;
 const IFRAME_MIN_HEIGHT = 524;
@@ -15,7 +15,7 @@ type EmbeddedAuthorizationProps = Omit<
   IframeHTMLAttributes<HTMLIFrameElement>,
   "src" | "srcDoc" | "allow" | "name"
 > & {
-  authorizeProps: AuthorizeProps;
+  authorizeProps: AuthorizePartialProps;
   onIssued: (data: {
     token: string;
     txId: string;
@@ -57,6 +57,8 @@ const EmbeddedAuthorization = forwardRef<
       );
     }
 
+    const { config } = useClient();
+
     const payload = useListenVioletAuthorization(channel);
 
     useEffect(() => {
@@ -71,6 +73,7 @@ const EmbeddedAuthorization = forwardRef<
 
     const url = buildAuthorizationUrl({
       ...authorizeProps,
+      ...config,
     });
 
     return (
