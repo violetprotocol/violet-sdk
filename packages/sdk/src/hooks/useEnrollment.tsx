@@ -1,8 +1,8 @@
-// "use client";
+"use client";
 
 import { VioletContext } from "@/providers/VioletProvider";
-import { useCallback, useContext, useEffect, useState } from "react";
 import { isAddress } from "@ethersproject/address";
+import { useCallback, useContext, useEffect, useState } from "react";
 
 const useEnrollment = ({ userAddress }: { userAddress?: string }) => {
   const client = useContext(VioletContext);

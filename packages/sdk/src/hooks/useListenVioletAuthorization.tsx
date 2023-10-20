@@ -1,10 +1,10 @@
-// "use client";
+"use client";
 
-import { useState, useEffect } from "react";
 import { VIOLET_AUTHORIZATION_CHANNEL } from "@/constants";
 import { AuthorizationEvent, AuthorizeVioletResponse } from "@/types";
-import { splitSignature } from "@ethersproject/bytes";
 import type { Signature } from "@ethersproject/bytes";
+import { splitSignature } from "@ethersproject/bytes";
+import { useEffect, useState } from "react";
 
 type PayloadType =
   | {
@@ -33,7 +33,7 @@ type PayloadType =
     };
 
 const useListenVioletAuthorization = (
-  channel: string = VIOLET_AUTHORIZATION_CHANNEL
+  channel: string = VIOLET_AUTHORIZATION_CHANNEL,
 ) => {
   const [payload, setPayload] = useState<PayloadType>({
     event: AuthorizationEvent.INACTIVE,

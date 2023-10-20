@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 import { VioletContext } from "@/providers/VioletProvider";
 import { useContext } from "react";

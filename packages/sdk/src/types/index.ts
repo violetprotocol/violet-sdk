@@ -1,5 +1,5 @@
-import { mode } from "../lib";
 import type { Signature } from "@ethersproject/bytes";
+import { mode } from "../lib";
 
 type VioletConfigParams = {
   clientId: string;
@@ -72,11 +72,11 @@ type EnrollmentPartialProps = Omit<
 >;
 
 type ConfiguredAuthorize = (
-  authorizePartialProps: AuthorizePartialProps
+  authorizePartialProps: AuthorizePartialProps,
 ) => Promise<AuthorizeResponse | void>;
 
 type ConfiguredEnroll = (
-  enrollmentPartialProps: EnrollmentPartialProps
+  enrollmentPartialProps: EnrollmentPartialProps,
 ) => Promise<EnrollmentResponse | void>;
 
 enum AuthorizationEvent {
@@ -87,19 +87,19 @@ enum AuthorizationEvent {
 }
 
 export type {
-  VioletConfigParams,
-  EnrollProps,
-  EnrollmentResponse,
+  AuthorizePartialProps,
   AuthorizeProps,
   AuthorizeResponse,
   AuthorizeVioletResponse,
-  EAT,
-  RedirectOptions,
-  PopupOptions,
-  AuthorizePartialProps,
-  EnrollmentPartialProps,
   ConfiguredAuthorize,
   ConfiguredEnroll,
+  EAT,
+  EnrollProps,
+  EnrollmentPartialProps,
+  EnrollmentResponse,
+  PopupOptions,
+  RedirectOptions,
+  VioletConfigParams,
 };
 
 export { AuthorizationEvent };

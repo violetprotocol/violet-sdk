@@ -1,5 +1,6 @@
 "use client";
 
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import {
   buildAuthorizationUrl,
   createVioletClient,
@@ -10,18 +11,9 @@ import {
 } from "@violetprotocol/sdk";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount, useConnect, useNetwork } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
-import {
-  CHAIN_ID,
-  CLIENT_ID,
-  TX_FUNCTION_SIGNATURE,
-  TX_DATA,
-  TX_CONTRACT_ADDRESS,
-  LOCAL_API_URL,
-  REDIRECT_URL,
-} from "../constants";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../components/Button";
 import {
   Dialog,
@@ -34,7 +26,15 @@ import {
 } from "../components/Dialog";
 import { Input } from "../components/Input";
 import { Label } from "../components/Label";
-import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import {
+  CHAIN_ID,
+  CLIENT_ID,
+  LOCAL_API_URL,
+  REDIRECT_URL,
+  TX_CONTRACT_ADDRESS,
+  TX_DATA,
+  TX_FUNCTION_SIGNATURE,
+} from "../constants";
 
 const BRAND_COLOR = "#9a4cff";
 const ERROR_COLOR = "#dc2626";
@@ -47,9 +47,6 @@ type FormValues = {
   redirectUrl: string;
   clientId: string;
 };
-
-const IFRAME_WIDTH = 384;
-const IFRAME_HEIGHT = 416;
 
 const Page = () => {
   const { isConnected, address } = useAccount();
@@ -71,7 +68,7 @@ const Page = () => {
     useState<string>(TX_CONTRACT_ADDRESS);
   const [redirectUrl, setRedirectUrl] = useState<string>(REDIRECT_URL);
   const [clientId, setClientId] = useState<string>(CLIENT_ID);
-  const [network, setNetwork] = useState<number>(CHAIN_ID.OPTIMISM_GOERLI);
+  const [chainId, setChainId] = useState<number>(CHAIN_ID.OPTIMISM_GOERLI);
   const [, copyToClipboard] = useCopyToClipboard();
   const [isParametersDialogOpen, setIsParametersDialogOpen] = useState(false);
 
@@ -183,10 +180,10 @@ const Page = () => {
   useEffect(() => {
     if (!chain) return;
 
-    if (chain.id === network) return;
+    if (chain.id === chainId) return;
 
-    setNetwork(chain.id);
-  }, [network, chain]);
+    setChainId(chain.id);
+  }, [chainId, chain]);
 
   useEffect(() => {
     if (!chain) return;
@@ -205,15 +202,15 @@ const Page = () => {
   return (
     <>
       {address ? (
-        <span className="absolute top-4 right-4">{address}</span>
+        <span className="absolute right-4 top-4">{address}</span>
       ) : null}
       {address ? (
-        <span className="absolute top-4 left-4">
+        <span className="absolute left-4 top-4">
           This address is {!isEnrolled ? "not" : ""} enrolled
         </span>
       ) : null}
 
-      <main className="flex h-screen justify-center items-center">
+      <main className="flex h-screen items-center justify-center">
         {!isConnected ? (
           <div
             id="NOT_CONNECTED"
@@ -405,12 +402,12 @@ const Page = () => {
               </DialogTrigger>
               <DialogContent className="bg-neutral-50">
                 <EmbeddedAuthorization
-                  authorizeProps={{
+                  authorizationParameters={{
                     transaction,
                     address,
-                    chainId: chain.id,
+                    chainId,
                   }}
-                  onIssued={(data) => {
+                  onAuthorized={(data) => {
                     console.log(data);
                   }}
                   onFailed={(error) => {
@@ -435,7 +432,7 @@ const Page = () => {
                     clientId,
                     redirectUrl,
                     apiUrl,
-                  })
+                  }),
                 )
               }
             >

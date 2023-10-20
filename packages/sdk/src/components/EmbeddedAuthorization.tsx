@@ -1,11 +1,11 @@
-// "use client";
+"use client";
 
 import { useListenVioletAuthorization } from "@/hooks/useListenVioletAuthorization";
 import { AuthorizationEvent, AuthorizePartialProps } from "@/types";
 import { buildAuthorizationUrl } from "@/utils/buildAuthorizationUrl";
 import { cn } from "@/utils/cn";
-import { IframeHTMLAttributes, forwardRef, useEffect } from "react";
 import type { Signature } from "@ethersproject/bytes";
+import { IframeHTMLAttributes, forwardRef, useEffect } from "react";
 import { VIOLET_AUTHORIZATION_CHANNEL, useClient } from "..";
 
 const IFRAME_MIN_WIDTH = 384;
@@ -15,8 +15,8 @@ type EmbeddedAuthorizationProps = Omit<
   IframeHTMLAttributes<HTMLIFrameElement>,
   "src" | "srcDoc" | "allow" | "name"
 > & {
-  authorizeProps: AuthorizePartialProps;
-  onIssued: (data: {
+  authorizationParameters: AuthorizePartialProps;
+  onAuthorized: (data: {
     token: string;
     txId: string;
     signature: Signature;
@@ -34,8 +34,8 @@ const EmbeddedAuthorization = forwardRef<
 >(
   (
     {
-      authorizeProps,
-      onIssued,
+      authorizationParameters,
+      onAuthorized,
       onFailed,
       className,
       channel = VIOLET_AUTHORIZATION_CHANNEL,
@@ -43,17 +43,17 @@ const EmbeddedAuthorization = forwardRef<
       height = IFRAME_MIN_HEIGHT,
       ...props
     },
-    ref
+    ref,
   ) => {
     if (width < IFRAME_MIN_WIDTH) {
       console.warn(
-        `Provided width is less than minimum width, consider changing it to prevent possible UI issues. Minimum width is ${IFRAME_MIN_WIDTH}px.`
+        `Provided width is less than minimum width, consider changing it to prevent possible UI issues. Minimum width is ${IFRAME_MIN_WIDTH}px.`,
       );
     }
 
     if (height < IFRAME_MIN_HEIGHT) {
       console.warn(
-        `Provided height is less than minimum height, consider changing it to prevent possible UI issues. Minimum height is ${IFRAME_MIN_HEIGHT}px.`
+        `Provided height is less than minimum height, consider changing it to prevent possible UI issues. Minimum height is ${IFRAME_MIN_HEIGHT}px.`,
       );
     }
 
@@ -63,28 +63,28 @@ const EmbeddedAuthorization = forwardRef<
 
     useEffect(() => {
       if (payload.event === AuthorizationEvent.COMPLETED) {
-        onIssued(payload.data);
+        onAuthorized(payload.data);
       }
 
       if (payload.event === AuthorizationEvent.ERROR) {
         onFailed(payload.data);
       }
-    }, [payload, onIssued, onFailed]);
+    }, [payload, onAuthorized, onFailed]);
 
     const url = buildAuthorizationUrl({
-      ...authorizeProps,
+      ...authorizationParameters,
       ...config,
     });
 
     return (
       <div
         className={cn(
-          "w-full h-full flex justify-center items-center",
-          className
+          "flex h-full w-full items-center justify-center",
+          className,
         )}
       >
         <iframe
-          className="border-none rounded-2xl"
+          className="rounded-2xl border-none"
           name="violet-authorization"
           ref={ref}
           src={url}
@@ -95,7 +95,7 @@ const EmbeddedAuthorization = forwardRef<
         />
       </div>
     );
-  }
+  },
 );
 
 EmbeddedAuthorization.displayName = "EmbeddedAuthorization";

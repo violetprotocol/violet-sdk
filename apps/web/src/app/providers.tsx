@@ -1,19 +1,19 @@
 "use client";
 
-import { ReactNode } from "react";
-import { WagmiConfig, createConfig, configureChains } from "wagmi";
-import {
-  mainnet,
-  arbitrumGoerli,
-  arbitrum,
-  polygonMumbai,
-  optimismGoerli,
-  optimism,
-  polygon,
-} from "@wagmi/core/chains";
-import { publicProvider } from "wagmi/providers/public";
+import { CLIENT_ID, LOCAL_API_URL, REDIRECT_URL } from "@/constants";
 import { VioletProvider, createVioletClient } from "@violetprotocol/sdk";
-import { CLIENT_ID, REDIRECT_URL, LOCAL_API_URL } from "@/constants";
+import {
+  arbitrum,
+  arbitrumGoerli,
+  mainnet,
+  optimism,
+  optimismGoerli,
+  polygon,
+  polygonMumbai,
+} from "@wagmi/core/chains";
+import { ReactNode } from "react";
+import { WagmiConfig, configureChains, createConfig } from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
 
 const { publicClient, webSocketPublicClient } = configureChains(
   [
@@ -25,7 +25,7 @@ const { publicClient, webSocketPublicClient } = configureChains(
     optimism,
     polygon,
   ],
-  [publicProvider()]
+  [publicProvider()],
 );
 
 const config = createConfig({
