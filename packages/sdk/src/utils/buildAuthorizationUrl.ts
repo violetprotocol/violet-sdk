@@ -28,6 +28,8 @@ const buildAuthorizationUrl = ({
     `${ETHEREUM_NAMESPACE}:${chainId}:${address}`
   );
 
+  url.searchParams.append("chain_id", chainId.toString());
+
   if (state) {
     url.searchParams.append("dapp_state", state);
   }
