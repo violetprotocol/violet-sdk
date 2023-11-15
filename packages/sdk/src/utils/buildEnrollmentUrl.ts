@@ -21,6 +21,8 @@ const buildEnrollmentUrl = ({
     `${ETHEREUM_NAMESPACE}:${chainId}:${address}`
   );
 
+  url.searchParams.append("chain_id", chainId.toString());
+
   url.searchParams.append("client_id", clientId);
 
   url.searchParams.append("redirect_uri", redirectUrl);
