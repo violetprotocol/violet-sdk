@@ -17,17 +17,17 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.30",
-    "eslint": "^8.51.0",
+    "@types/react": "^18.2.37",
+    "eslint": "^8.53.0",
     "eslint-config-custom": "workspace:*",
-    "prettier": "^3.0.3",
+    "prettier": "^3.1.0",
     "react": "^18.2.0",
     "tsconfig": "workspace:*",
-    "tsup": "^7.2.0",
+    "tsup": "^7.3.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^4.2.1",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@violetprotocol/sdk": "workspace:*",
     "@web3-react/core": "^8.2.3"
   }
