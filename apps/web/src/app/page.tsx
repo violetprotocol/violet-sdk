@@ -1,19 +1,5 @@
 "use client";
 
-import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
-import {
-  buildAuthorizationUrl,
-  createVioletClient,
-  EmbeddedAuthorization,
-  useAuthorization,
-  useClient,
-  useEnrollment,
-} from "@violetprotocol/sdk";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useAccount, useConnect, useNetwork } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
 import { Button } from "../components/Button";
 import {
   Dialog,
@@ -35,6 +21,20 @@ import {
   TX_DATA,
   TX_FUNCTION_SIGNATURE,
 } from "../constants";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import {
+  buildAuthorizationUrl,
+  createVioletClient,
+  EmbeddedAuthorization,
+  useAuthorization,
+  useClient,
+  useEnrollment,
+} from "@violetprotocol/sdk";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useAccount, useConnect, useNetwork } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
 const BRAND_COLOR = "#9a4cff";
 const ERROR_COLOR = "#dc2626";
@@ -148,7 +148,7 @@ const Page = () => {
     setIsParametersDialogOpen(false);
   };
 
-  // REDIRECT
+  // HANDLE CALLBACK REDIRECT
   useEffect(() => {
     const params = {};
 
